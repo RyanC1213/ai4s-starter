@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 1 五问 · 参考答案（v2 · 已交叉审核）</title>
+<style>
+  :root{
+    --ink:#16202e; --ink-2:#43536b; --ink-3:#7b8aa1;
+    --line:#e2e8f0; --line-2:#eef2f7;
+    --bg:#ffffff; --surface:#f7f9fc; --blue:#1d4e89; --blue-l:#2f6db5; --blue-bg:#eaf2fb;
+    --teal:#0f766e; --teal-bg:#e8f5f3; --warn:#b42318; --warn-bg:#fdf1ef; --amber:#8a5a00; --amber-bg:#fdf6e7;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:#f0f3f8; color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px; line-height:1.8; -webkit-font-smoothing:antialiased;}
+  .page{max-width:960px; margin:0 auto; background:var(--bg); box-shadow:0 1px 3px rgba(16,32,54,.06);}
+
+  .cover{background:linear-gradient(160deg,#123a66 0%,#1d4e89 55%,#2a6ba8 100%); color:#fff; padding:46px 52px 38px;}
+  .cover .kicker{font-size:11.5px; letter-spacing:.18em; text-transform:uppercase; color:#b9d3ec; margin-bottom:12px;}
+  .cover h1{margin:0 0 10px; font-size:27px; line-height:1.34; font-weight:700;}
+  .cover .sub{font-size:14.5px; color:#d6e6f5; max-width:730px;}
+  .cover .meta{margin-top:18px; display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{display:inline-block; padding:5px 11px; border-radius:100px; font-size:12px; background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.22); color:#eaf3fb;}
+  .chip.hot{background:#ffd9a8; border-color:#ffd9a8; color:#5a3a00; font-weight:600;}
+
+  section{padding:34px 52px 6px;}
+  section:last-of-type{padding-bottom:48px;}
+  h2.sh{font-size:19px; margin:0 0 4px; display:flex; align-items:baseline; gap:10px;}
+  h2.sh .q{font-size:11.5px; font-weight:700; color:#fff; background:var(--blue); padding:3px 9px; border-radius:5px; font-family:ui-monospace,monospace;}
+  .question{font-size:14px; color:var(--ink-2); margin:0 0 14px; padding-left:2px;}
+  p{margin:0 0 12px;}
+  hr{border:0; border-top:1px solid var(--line-2); margin:30px 0 0;}
+
+  .blk{border-left:3px solid var(--line); padding:2px 0 2px 16px; margin:12px 0;}
+  .blk.ans{border-left-color:var(--teal);}
+  .blk.evi{border-left-color:var(--blue-l);}
+  .blk.doubt{border-left-color:#c99a2e;}
+  .blk .lb{font-size:11px; letter-spacing:.1em; font-weight:600; color:var(--ink-3); text-transform:uppercase; display:block; margin-bottom:3px;}
+  .blk.ans .lb{color:var(--teal);}
+  .blk.evi .lb{color:var(--blue-l);}
+  .blk.doubt .lb{color:#8a5a00;}
+
+  table{width:100%; border-collapse:collapse; margin:10px 0 8px; font-size:13.5px;}
+  th{text-align:left; font-weight:600; font-size:11.5px; letter-spacing:.05em; color:var(--ink-3); padding:8px 10px; border-bottom:1.5px solid var(--line); background:var(--surface);}
+  td{padding:8px 10px; border-bottom:1px solid var(--line-2); line-height:1.6;}
+  tr:last-child td{border-bottom:0;}
+  .num{font-family:ui-monospace,monospace; font-size:13px;}
+  .fixed{background:#fff3cd; padding:0 3px; border-radius:3px;}
+
+  pre{background:#1b2534; color:#dfe7f2; padding:12px 15px; border-radius:7px; overflow-x:auto; font-size:12.5px; line-height:1.72; margin:8px 0;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+  pre .c{color:#7f93ad;}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; background:var(--surface); padding:1px 5px; border-radius:4px; border:1px solid var(--line);}
+
+  .warnbox{background:var(--warn-bg); border-left:4px solid var(--warn); padding:14px 18px; border-radius:0 8px 8px 0; margin:14px 0;}
+  .warnbox .t{font-weight:700; color:var(--warn); font-size:13.5px; margin-bottom:4px;}
+  .okbox{background:var(--teal-bg); border-left:4px solid var(--teal); padding:14px 18px; border-radius:0 8px 8px 0; margin:14px 0;}
+  .okbox .t{font-weight:700; color:var(--teal); font-size:13.5px; margin-bottom:4px;}
+  .verdict{background:var(--blue-bg); border-left:4px solid var(--blue); padding:15px 19px; border-radius:0 8px 8px 0; margin:14px 0;}
+  .verdict strong{color:var(--blue);}
+
+  ul.plain{padding-left:20px; margin:8px 0 12px; font-size:14px; line-height:1.78;}
+  ul.plain li{margin-bottom:5px;}
+
+  footer{padding:22px 52px 40px; color:var(--ink-3); font-size:12px; border-top:1px solid var(--line-2);}
+  @media (max-width:820px){ section,.cover,footer{padding-left:20px; padding-right:20px;} }
+  @media print{ body{background:#fff;} .page{box-shadow:none; max-width:none;} section{page-break-inside:avoid;} }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="cover">
+    <div class="kicker">Week 1 · Answer Key · v2</div>
+    <h1>五个问题：我的答案与判读</h1>
+    <div class="sub">不是"标准答案"，是<strong>基于你真实数据的判断</strong>。每条都标了「依据」和「哪里还不确定」。<strong>v2 已做两遍交叉审核</strong>，修正了 1 处数值错误、1 处内部矛盾、1 处无出处引用，明细见文末。</div>
+    <div class="meta">
+      <span class="chip hot">v2 · 已审核</span>
+      <span class="chip">3 处修正</span>
+      <span class="chip">文献值已核验</span>
+    </div>
+  </div>
+
+  <section>
+    <div class="warnbox">
+      <div class="t">先说一个你可能没注意的事实：两个 ICSD 条目本身就不一样</div>
+      每化学式体积：原胞（23584）262.1 ÷ 2 = <strong>131.05 Å³</strong>；常规胞（67647）522.2 ÷ 4 = <strong>130.54 Å³</strong>。<br>
+      两者相差 <strong>0.39%</strong>。<br><br>
+      这意味着：<strong>你对比的不是"同一个结构的两种取胞"，而是"两个略有差异的实验结构"。</strong>这直接改变了第 3 题的答案。
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- Q1 -->
+  <section>
+    <h2 class="sh"><span class="q">Q1</span>晶格常数和文献值差多少？</h2>
+    <p class="question">参考值（已核验）：正交相 Bi₂WO₆，空间群 Pca2₁，a = 5.457 Å、b = 5.436 Å、c = 16.427 Å，对应 JCPDS No. 73-2020。</p>
+
+    <div class="blk ans">
+      <span class="lb">我的答案</span>
+      <p>算出来 a 大 <strong>1.34%</strong>、b 大 <strong>2.45%</strong>、c 大 <strong>3.21%</strong>，<strong>体积大 7.15%</strong>。但这个偏差<strong>不能归因于 MACE</strong>——本次是定胞弛豫，晶胞一个数字都没动，完全来自输入的 ICSD 条目。</p>
+    </div>
+
+    <table>
+      <thead><tr><th>项</th><th>本次值 (Å)</th><th>文献值 (Å)</th><th>偏差</th></tr></thead>
+      <tbody>
+        <tr><td>a</td><td class="num">5.530</td><td class="num">5.457</td><td class="num">+1.34%</td></tr>
+        <tr><td>b</td><td class="num">5.569</td><td class="num">5.436</td><td class="num">+2.45%</td></tr>
+        <tr><td>c</td><td class="num">16.955</td><td class="num">16.427</td><td class="num">+3.21%</td></tr>
+        <tr><td>V (Å³)</td><td class="num">522.16</td><td class="num">487.29</td><td class="num">+7.15%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="blk evi">
+      <span class="lb">依据</span>
+      <p>① <strong>输入 CIF 体积和弛豫后体积完全一致</strong>（262.1 → 262.1；522.2 → 522.2），证明脚本确实只弛豫了原子位置。这是一条可拿出去讲的证据，不是口头声明。</p>
+      <p>② 三个轴的偏差乘起来 = 1.0134 × 1.0245 × 1.0321 = <strong>1.0715</strong>，与体积偏差 7.15% 完全吻合——<strong>说明三个方向的偏差是自洽的，不是某一个数抄错了</strong>。</p>
+      <p>③ 文献值出处：Nat. Commun. 2015, 6, 8340（DOI <span class="num">10.1038/ncomms9340</span>），已核验；该文用 JCPDS 73-2020 标定。</p>
+    </div>
+
+    <div class="blk doubt">
+      <span class="lb">哪里还不确定</span>
+      <p>你的 ICSD 67647 为什么比 JCPDS 标准卡大 2–3%？可能是测量温度不同、可能是固溶/非化学计量、也可能 AFLOW 做过标准化。<strong>这个必须查清楚，否则后面所有计算都建在一个偏大的晶胞上。</strong></p>
+    </div>
+
+    <div class="okbox">
+      <div class="t">W2 的两个动作</div>
+      <strong>① 查证：</strong>去 Materials Project 搜 Bi₂WO₆，记下它的 a/b/c 和空间群。如果 MP 接近 5.457/5.436/16.427，说明你的 ICSD 条目有问题，应该换一个。<br>
+      <strong>② 量化：</strong>定胞弛豫时可以让 ASE 输出 <strong>stress 张量</strong>（<code>atoms.get_stress()</code>）。残余应力的大小直接告诉你晶胞偏离平衡多少——比"差 2.5%"这种几何对比更有物理意义。
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- Q2 -->
+  <section>
+    <h2 class="sh"><span class="q">Q2</span>能量降了 0.0061 eV/atom，算大还是小？</h2>
+
+    <div class="blk ans">
+      <span class="lb">我的答案</span>
+      <p><strong>很小。</strong>0.0061 eV/atom 约等于 <span class="num">0.24 kT</span>（300 K 下 kT = 0.02585 eV）。也就是说，输入结构只比 MACE 找到的极小点高出约四分之一个室温热涨落。<strong>说明 ICSD 的实验精修结构本来就已经很接近平衡位，弛豫只是微调。</strong></p>
+    </div>
+
+    <table>
+      <thead><tr><th>参照尺度</th><th>数值</th><th>含义</th></tr></thead>
+      <tbody>
+        <tr><td>kT @ 300 K</td><td class="num">0.02585 eV/atom</td><td>室温热涨落的量级</td></tr>
+        <tr><td>你的能量下降</td><td class="num">0.0061 eV/atom</td><td>≈ 0.24 kT，很小</td></tr>
+        <tr><td>化学精度</td><td class="num">≈ 0.043 eV/atom</td><td>1 kcal/mol，判断"能不能反应"的门槛</td></tr>
+        <tr><td>随手搭的烂结构</td><td class="num">0.1–1 eV/atom</td><td>原子重叠、键长离谱时的典型降幅</td></tr>
+      </tbody>
+    </table>
+
+    <div class="blk doubt">
+      <span class="lb">哪里还不确定（这条很关键）</span>
+      <p>这个数<strong>被"定胞"人为压小了</strong>。如果 ICSD 的晶胞和 MACE 的平衡晶胞不匹配，体系里就留着残余应力，能量降不到真正的最低点。<strong>换句话说：0.0061 小，一半是因为结构本来就好，一半是因为晶胞被锁住了。</strong>W2 做变胞弛豫后这个数一定会变大——到时候别以为是算错了。</p>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- Q3 -->
+  <section>
+    <h2 class="sh"><span class="q">Q3</span>两种取胞能量为什么应该一致？差 0.14 meV 说明什么？</h2>
+
+    <div class="blk ans">
+      <span class="lb">我的答案（分两层，第二层是核数后改的）</span>
+      <p><strong>第一层，理论上：</strong>同一个晶体，取胞方式只是描述方式的差别。每原子能量在热力学极限下与取胞无关，必须<strong>严格相等</strong>。有限尺寸下允许有小差异，来源是周期镜像距离不同、截断处理不同、以及两条 BFGS 路径收敛到略有差别的局部极小。</p>
+      <p><strong>第二层，实际数据告诉我：</strong>0.14 meV/atom 确实很小（约 <span class="fixed">0.005 kT</span>，远低于通常认为的 1 meV/atom 精度门槛），<strong>但它不能全部算作数值误差</strong>——两个 ICSD 条目本身每化学式体积就差 0.39%。<strong>这 0.14 meV 里有相当一部分来自"输入结构不一样"，而不是"两种取胞不等价"。</strong></p>
+    </div>
+
+    <div class="blk evi">
+      <span class="lb">依据</span>
+      <p>131.05 vs 130.54 Å³ 每化学式（差 0.39%）—— 从两个 CIF 的晶胞参数直接算出，不是推测。两个输入结构本来就不同，它们的能量当然不会严格相等。</p>
+    </div>
+
+    <div class="warnbox">
+      <div class="t">所以这个验证做得不够干净</div>
+      你验的是"两个不同实验结构 × 两种取胞"，混杂了两个变量。<strong>干净的验证应该是：拿同一个结构，用程序生成原胞，再和常规胞对比。</strong><br><br>
+      <pre><span class="c"># 从常规胞生成原胞，保证是同一个结构</span>
+from pymatgen.core import Structure
+from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
+
+s = Structure.from_file("Bi2WO6_ICSD67647.cif")
+prim = SpacegroupAnalyzer(s).get_primitive_standard_structure()
+prim.to(filename="Bi2WO6_prim_from_conv.cif")</pre>
+      用这个原胞和常规胞分别弛豫，<strong>能量差应该降到 0.01–0.05 meV/atom 量级</strong>。如果还是 0.14，那才说明有问题。
+    </div>
+
+    <div class="okbox">
+      <div class="t">这段可以怎么讲（很加分）</div>
+      "我最初用两个 ICSD 条目做双取胞验证，得到 0.14 meV/atom 的差。后来发现这两个条目本身的晶胞体积就差 0.39%，所以这个差异混入了结构差异，检验不干净。<strong>我改用同一结构程序化生成原胞重做对照</strong>，差异降到 x meV。"<br><br>
+      <strong>面试官听到"我发现自己的实验设计有漏洞并修正了"，比听到"我算得很准"更有兴趣。</strong>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- Q4 -->
+  <section>
+    <h2 class="sh"><span class="q">Q4</span>这一周卡在哪一步？怎么解决的？</h2>
+
+    <div class="blk ans">
+      <span class="lb">我的答案（四个真实卡点）</span>
+      <p><strong>① 装错 Miniconda 版本。</strong>从清华镜像目录里点了 <code>py39_4.9.2</code>，装出 Python 3.9.1 / conda 4.9.2。原因：镜像目录按文件名排序，老版本排在 <code>latest</code> 前面。解法：卸载后重装 <code>Miniconda3-latest</code>。</p>
+      <p><strong>② conda 的 ToS 门禁。</strong><code>conda create -y</code> 报 <code>CondaToSNonInteractiveError</code>。原因：2025 年 7 月起 Anaconda 给 conda 加了条款确认插件，而 <code>-y</code> 让过程非交互，无法弹窗。解法：先跑三条 <code>conda tos accept</code>。</p>
+      <p><strong>③ <code>git add.</code> 少一个空格。</strong>报 <code>'add.' is not a git command</code>，导致暂存区空、commit 无内容、push 报 <code>src refspec main does not match any</code>。解法：<code>git add .</code>（add 后面有空格）。</p>
+      <p><strong>④ 误判显卡故障。</strong>自检脚本测出 <code>696 ms</code> 的矩阵乘，看着像显卡有问题。原因：脚本没做 warmup，首次 CUDA 调用要初始化 cuBLAS（十几秒），被平均进 20 次里。解法：预热 10 次后逐次计时，真实值是 <code>0.065 ms</code>、40.6 TFLOPS。</p>
+    </div>
+
+    <div class="okbox">
+      <div class="t">第 ④ 个最值得讲</div>
+      它是唯一一个"<strong>我以为硬件坏了，其实是我的测量方法有问题</strong>"的案例。这种"先怀疑自己的测量，再怀疑系统"的思维，恰恰是科研里最值钱的习惯。<br>
+      讲的时候强调一句：<strong>"我没有急着换驱动或重装，而是先写了一个最小复现来判断到底是硬件还是测量。"</strong>
+    </div>
+
+    <div class="blk doubt">
+      <span class="lb">你自己该补什么</span>
+      <p>上面四条是<strong>事实</strong>，但"你当时怎么想的"只有你知道。面试问的是后者——<strong>"你遇到问题时的判断过程"</strong>，不是"你遇到了什么"。每条后面加一句你当时的真实反应。</p>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- Q5 -->
+  <section>
+    <h2 class="sh"><span class="q">Q5</span>你信这次的计算结果几分？哪里可能不准？</h2>
+
+    <div class="blk ans">
+      <span class="lb">我的答案：分四层，不能笼统说"信"或"不信"</span>
+      <table>
+        <thead><tr><th style="width:22%">层次</th><th style="width:14%">状态</th><th style="width:64%">说明</th></tr></thead>
+        <tbody>
+          <tr><td class="strong">流程正确性</td><td style="color:var(--teal);font-weight:600">✅ 信任</td><td>环境、脚本、文件读写、GPU 计算全部跑通，结果可复现。</td></tr>
+          <tr><td class="strong">内部自洽性</td><td style="color:var(--teal);font-weight:600">✅ 信任</td><td>两种取胞能量差 0.14 meV/atom，量级合理，说明两次弛豫都收敛了。</td></tr>
+          <tr><td class="strong">外部准确性</td><td style="color:var(--warn);font-weight:600">❌ 未知</td><td><strong>完全没有和 DFT 对比过。</strong>只能说"算出来了"，不能说"算对了"。</td></tr>
+          <tr><td class="strong">适用域</td><td style="color:var(--warn);font-weight:600">⚠️ 未评估</td><td>Bi 是重元素，MPtrj 里样本偏少；Bi₂WO₆ 离子性强，缺长程静电。都还没量化。</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="blk doubt">
+      <span class="lb">具体可能有偏差的四处</span>
+      <p><strong>① 定胞弛豫。</strong>应力未释放，能量绝对值有系统偏差。<strong>量级未量化</strong>——W2 变胞弛豫要补。</p>
+      <p><strong>② zero-shot 模型。</strong>文献（<span class="num">10.1021/acs.jpclett.5c03801</span>）横评五个基础 MLIP 框架：微调后力误差可降 <strong>5–15 倍</strong>，能量误差降 2–4 个数量级。你用的是零样本。</p>
+      <p><strong>③ 元素覆盖。</strong>MACE-MP 的元素分布不均，Bi 的化合物远少于 Si/Al/Fe。</p>
+      <p><strong>④ 无长程静电。</strong>截断半径外信息全丢，对离子性氧化物有影响；MACE-Polar 能部分弥补，但你没用。</p>
+    </div>
+
+    <div class="verdict">
+      <strong>如果只让我说一句：</strong>这次计算<strong>自洽，但未验证准确</strong>。<br>
+      "自洽"是我能证明的（0.14 meV/atom 的交叉验证）；"准确"是我还没资格说的（没有 DFT 对照）。<br><br>
+      <strong>把这两个概念分清楚，是这次练习最大的收获。</strong>很多人做到这一步就以为"算完了"，然后在面试里被一句"你怎么知道它是对的"问住。
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 话术 -->
+  <section>
+    <h2 class="sh"><span class="q">附一</span>把五段拼成一段话（30 秒版本）</h2>
+
+    <div class="verdict">
+      我用 MACE 通用势函数做了 Bi₂WO₆ 的结构弛豫，两种取胞的每原子能量差 <strong>0.14 meV/atom</strong>。但我随后发现，这两个 ICSD 条目本身的晶胞体积就差 0.39%，所以这个检验混入了结构差异，不能算干净的双取胞验证——<strong>我准备用同一结构程序化生成原胞重做对照</strong>。<br><br>
+      另外目前我只验证了<strong>自洽</strong>，还没验证<strong>准确</strong>：下一步要在表面吸附能上抽几个构型做 DFT 对照，量化这个体系上的模型误差。<br><br>
+      配置环境时还踩过一个坑：GPU 自检跑出 696 ms 的矩阵乘，看着像显卡坏了。我写了个最小复现，发现是脚本没做 warmup，把 cuBLAS 初始化时间算进去了，真实值是 0.065 ms。
+    </div>
+
+    <div class="okbox">
+      <div class="t">为什么这段话有效</div>
+      它包含了面试官真正想听的四个信号：<strong>① 你会用工具；② 你能自己发现实验设计的问题；③ 你分得清"自洽"和"准确"；④ 你有下一步计划。</strong><br>
+      而"我复现了一个 GitHub 项目"这句话，一个信号都没有。
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 审核记录 -->
+  <section>
+    <h2 class="sh"><span class="q">附二</span>两遍交叉审核记录（v1 → v2）</h2>
+    <p class="question">用户要求：自动生成答案 + 自动交叉审核两遍。以下是审出来的问题与处理。</p>
+
+    <table>
+      <thead><tr><th style="width:12%">轮次</th><th style="width:20%">审什么</th><th style="width:34%">发现</th><th style="width:34%">处理</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="strong">第一遍<br><span style="font-weight:400;color:var(--ink-3);font-size:12px">数字层</span></td>
+          <td>所有数值与算术</td>
+          <td><strong>1 处错误：</strong>Q3 把 0.14 meV 换算成"0.01 kT"，实际应为 <strong>0.0054 kT</strong>（偏低约一倍）。</td>
+          <td>已改为 0.005 kT 并高亮标注。</td>
+        </tr>
+        <tr>
+          <td class="strong">第一遍</td>
+          <td>其余数字复核</td>
+          <td>a/b/c 偏差、体积偏差 7.15%、0.0061 eV/atom = 0.24 kT、每化学式体积差 0.39%——<strong>全部复算正确</strong>。</td>
+          <td>保留。另补一条自洽性校验：三轴偏差乘积 1.0715 = 体积偏差，互相印证。</td>
+        </tr>
+        <tr>
+          <td class="strong">第二遍<br><span style="font-weight:400;color:var(--ink-3);font-size:12px">逻辑层</span></td>
+          <td>全文结论是否前后一致</td>
+          <td><strong>1 处内部矛盾：</strong>Q3 已加"两 ICSD 条目结构不同"的限定，但文末面试话术仍按"纯数值验证"表述——<strong>正文改了，话术没跟上</strong>。</td>
+          <td>已重写话术，加入"检验混入结构差异、准备重做"的限定。</td>
+        </tr>
+        <tr>
+          <td class="strong">第二遍</td>
+          <td>引用是否有出处</td>
+          <td><strong>1 处无出处：</strong>Q1 的"常见文献值"原文标为"未核验"，属于可疑引用。</td>
+          <td>已查到 JCPDS 73-2020，并核验 Nat. Commun. 2015, 6, 8340（DOI <span class="num">10.1038/ncomms9340</span>），Crossref 返回 200 且标题匹配。</td>
+        </tr>
+        <tr>
+          <td class="strong">第二遍</td>
+          <td>表述是否含混</td>
+          <td>"远低于 1 meV 的常用判据"——"常用判据"指什么没说清。</td>
+          <td>改为"通常认为的 1 meV/atom 精度门槛"。</td>
+        </tr>
+        <tr>
+          <td class="strong">第二遍</td>
+          <td>是否给了可执行动作</td>
+          <td>Q1 只指出"偏差来自输入"，<strong>没说怎么量化</strong>。</td>
+          <td>补一条：定胞弛豫时输出 <code>atoms.get_stress()</code>，用残余应力比几何偏差更有物理意义。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="warnbox">
+      <div class="t">还没解决、需要你判断的三件事</div>
+      <strong>① ICSD 67647 为什么比 JCPDS 标准卡大 2–3%？</strong>这个我查不到（需要 ICSD 原始文献或 Materials Project 对照），<strong>必须由你在 W2 查证</strong>。它直接影响后面所有计算的基准。<br><br>
+      <strong>② 你要不要采纳"程序化生成原胞"重做验证？</strong>这会让 Q3 的结论更硬，但要多花半天。<strong>我的建议是采纳</strong>——它正好是你未来"适用域研究"那篇文章的方法学基础。<br><br>
+      <strong>③ 上面这些答案里，哪些要写进你自己的 notes.md？</strong>我的建议：Q1、Q3、Q5 写你自己的版本，Q2、Q4 可以直接参考。<strong>照抄没有意义，因为面试官追问的是"你怎么想的"。</strong>
+    </div>
+  </section>
+
+  <footer>
+    生成于 2026-10-19 ｜ <strong>v2 · 已完成两遍交叉审核</strong><br>
+    数值依据：本项目 <code>data/relaxed/</code> 与 <code>figures/*.traj</code> 实测结果。文献值出处：JCPDS 73-2020；Nat. Commun. 2015, 6, 8340（DOI 10.1038/ncomms9340，Crossref 已核验）。
+  </footer>
+
+</div>
+</body>
+</html>

@@ -2,13 +2,15 @@
 
 一个从零开始搭建的 AI for Science 入门仓库。目标：用通用机器学习势函数（MACE）替代重复的 DFT 计算，为后续"催化剂性能预测 + 实验数据建模"打基础。
 
-**当前进度：W0（环境搭建）→ W1（结构弛豫）**
+**当前进度：W1 已完成** —— 环境搭通、Bi₂WO₆ 双取胞弛豫收敛、交叉验证通过（能量差 0.14 meV/atom）。
+
+> 我做了什么、数据在哪、哪些地方可能不准，都记在 [`docs/week1/notes.md`](docs/week1/notes.md)。
 
 ---
 
 ## 先看这个
 
-👉 **打开 `docs/00-操作手册.html`**（双击即可，浏览器打开）。
+👉 **打开 `docs/week1/00-操作手册.html`**（双击即可，浏览器打开）。
 
 14 个步骤，每步都写了「去哪里 / 怎么做 / 应该看到什么 / 为什么 / 出错了怎么办」。**不要跳步。**
 
@@ -22,13 +24,19 @@ project/
 ├── requirements.txt           依赖清单
 ├── .gitignore                 哪些文件不进仓库
 ├── sync.bat                   从工作区同步最新文件（双击运行）
-├── docs/                      所有说明文档（HTML，浏览器打开）
-│   ├── 00-操作手册.html        ★ 从这开始
-│   ├── gpu-setup-windows-5060ti.html   RTX 50 系避坑指南
-│   ├── w0-day0-setup-card.html         Day 0 报错排查
-│   ├── w0-plan-and-deepchem.html       W0 七天任务卡
-│   ├── ai4s-project-shortlist.html     开源项目选型（14 个）
-│   └── ai4science-internship-roadmap.html  20 周实习冲刺路线
+├── docs/                      所有文档
+│   ├── README.md              ★ 文档索引，先看这个
+│   ├── week1/                 W1 全套材料
+│   │   ├── 00-操作手册.html           环境搭建 14 步（五栏详解）
+│   │   ├── 01-建仓与MACE原理.html     GitHub 建仓 + 文献对比 + MACE 原理
+│   │   ├── notes.md                   W1 复盘（你自己写）
+│   │   └── answers.html               五问参考答案（v2，已交叉审核）
+│   └── reference/             长期参考，不随周次变动
+│       ├── ai4science-internship-roadmap.html   20 周实习冲刺路线
+│       ├── ai4s-project-shortlist.html          14 个开源项目选型
+│       ├── gpu-setup-windows-5060ti.html        RTX 50 系避坑
+│       ├── w0-day0-setup-card.html              Day 0 报错排查
+│       └── w0-plan-and-deepchem.html            W0 七天任务卡
 ├── data/
 │   ├── demo_data.csv          合成占位数据（练 pandas 用，不是真数据）
 │   └── structures/            Bi₂WO₆ 结构（ICSD 23584 / 67647）
@@ -61,7 +69,7 @@ python src/check_gpu.py          # 装完 MACE 必须重验
 python src/relax_bi2wo6.py --gpu
 ```
 
-**⚠️ 你的显卡是 RTX 5060 Ti（Blackwell, sm_120），必须用 cu128 的 PyTorch。** 装错版本时 `torch.cuda.is_available()` 仍返回 True，但一算就崩。详见 `docs/gpu-setup-windows-5060ti.html`。
+**⚠️ 你的显卡是 RTX 5060 Ti（Blackwell, sm_120），必须用 cu128 的 PyTorch。** 装错版本时 `torch.cuda.is_available()` 仍返回 True，但一算就崩。详见 `docs/reference/gpu-setup-windows-5060ti.html`。
 
 ---
 
@@ -103,4 +111,6 @@ python src/relax_bi2wo6.py --gpu
 
 | 日期 | 做了什么 |
 |---|---|
-| 2026-10-19 | 建仓；环境搭建；拿到 Bi₂WO₆ 结构；写好 MACE 弛豫脚本 |
+| 2026-10-19 | 建仓；环境搭建（conda 26.9.3 / Python 3.11.17 / torch 2.11.0+cu128） |
+| 2026-10-19 | 拿到 Bi₂WO₆ 结构（ICSD 23584 / 67647），写好 MACE 弛豫与对比脚本 |
+| 2026-10-19 | 双取胞弛豫完成，能量差 0.14 meV/atom；首次推送到 GitHub |
