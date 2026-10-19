@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# 虚拟环境（每个人自己建，不进仓库）
+.venv/
+venv/
+env/
+
+# 原始数据不进仓库（体积大、可能涉密）
+data/raw/
+data/relaxed/
+
+# 系统垃圾
+.DS_Store
+Thumbs.db
+*.log
+
+# 本地同步脚本（含绝对路径，不进公开仓库）
+sync.bat

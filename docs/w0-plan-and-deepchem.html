@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W0 小时级任务卡 · 附 DeepChem 项目可行性判断</title>
+<style>
+  :root{
+    --ink:#16202e; --ink-2:#43536b; --ink-3:#7b8aa1;
+    --line:#e2e8f0; --line-2:#eef2f7;
+    --bg:#ffffff; --surface:#f7f9fc; --surface-2:#eef4fb;
+    --blue:#1d4e89; --blue-l:#2f6db5; --blue-bg:#eaf2fb;
+    --teal:#0f766e; --teal-bg:#e8f5f3;
+    --warn:#b42318; --warn-bg:#fdf1ef;
+    --amber:#8a5a00; --amber-bg:#fdf6e7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:#f0f3f8; color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px; line-height:1.75; -webkit-font-smoothing:antialiased;
+  }
+  .page{max-width:960px; margin:0 auto; background:var(--bg); box-shadow:0 1px 3px rgba(16,32,54,.06);}
+
+  .cover{background:linear-gradient(160deg,#123a66 0%,#1d4e89 55%,#2a6ba8 100%); color:#fff; padding:46px 56px 38px;}
+  .cover .kicker{font-size:11.5px; letter-spacing:.18em; text-transform:uppercase; color:#b9d3ec; margin-bottom:12px;}
+  .cover h1{margin:0 0 10px; font-size:28px; line-height:1.35; font-weight:700; letter-spacing:-.01em;}
+  .cover .sub{font-size:14.5px; color:#d6e6f5; max-width:720px;}
+  .cover .meta{margin-top:22px; display:flex; flex-wrap:wrap; gap:9px;}
+  .chip{display:inline-block; padding:5px 11px; border-radius:100px; font-size:12px; background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.22); color:#eaf3fb;}
+  .chip.hot{background:#ffd9a8; border-color:#ffd9a8; color:#5a3a00; font-weight:600;}
+
+  section{padding:38px 56px 8px;}
+  section:last-of-type{padding-bottom:50px;}
+  h2{font-size:20px; margin:0 0 6px; letter-spacing:-.01em; display:flex; align-items:baseline; gap:10px;}
+  h2 .num{font-size:12px; font-weight:700; color:var(--blue-l); background:var(--blue-bg); padding:3px 8px; border-radius:5px; letter-spacing:.04em;}
+  h3{font-size:15.5px; margin:24px 0 8px;}
+  .lead{color:var(--ink-2); margin:0 0 18px; font-size:14.5px;}
+  p{margin:0 0 12px;}
+  hr{border:0; border-top:1px solid var(--line-2); margin:32px 0 0;}
+
+  .verdict{background:var(--blue-bg); border-left:4px solid var(--blue); padding:17px 20px; border-radius:0 8px 8px 0; margin:16px 0;}
+  .verdict strong{color:var(--blue);}
+  .warnbox{background:var(--warn-bg); border-left:4px solid var(--warn); padding:15px 19px; border-radius:0 8px 8px 0; margin:15px 0;}
+  .warnbox .t{font-weight:700; color:var(--warn); font-size:13.5px; margin-bottom:4px;}
+  .okbox{background:var(--teal-bg); border-left:4px solid var(--teal); padding:15px 19px; border-radius:0 8px 8px 0; margin:15px 0;}
+  .okbox .t{font-weight:700; color:var(--teal); font-size:13.5px; margin-bottom:4px;}
+
+  table{width:100%; border-collapse:collapse; margin:14px 0 6px; font-size:13.5px;}
+  th{text-align:left; font-weight:600; font-size:11.5px; letter-spacing:.05em; color:var(--ink-3); text-transform:uppercase; padding:9px 11px; border-bottom:1.5px solid var(--line); background:var(--surface);}
+  td{padding:10px 11px; border-bottom:1px solid var(--line-2); vertical-align:top; line-height:1.62;}
+  tr:last-child td{border-bottom:0;}
+  td.strong{font-weight:600; white-space:nowrap;}
+  .day{display:inline-block; background:var(--blue); color:#fff; font-size:11px; font-weight:700; padding:2px 7px; border-radius:4px; letter-spacing:.03em;}
+  .hrs{color:var(--ink-3); font-size:12px; display:block; margin-top:3px;}
+
+  pre{background:#1b2534; color:#dfe7f2; padding:14px 16px; border-radius:7px; overflow-x:auto; font-size:12.5px; line-height:1.65; margin:10px 0 12px;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;}
+  pre .c{color:#7f93ad;}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; background:var(--surface); padding:1px 5px; border-radius:4px; border:1px solid var(--line);}
+
+  .check{list-style:none; padding:0; margin:10px 0;}
+  .check li{position:relative; padding-left:24px; margin-bottom:8px; font-size:14px;}
+  .check li::before{content:""; position:absolute; left:0; top:7px; width:12px; height:12px; border:1.5px solid var(--ink-3); border-radius:3px;}
+  .nocheck{list-style:none; padding:0; margin:10px 0;}
+  .nocheck li{position:relative; padding-left:24px; margin-bottom:7px; font-size:14px; color:var(--ink-2);}
+  .nocheck li::before{content:"×"; position:absolute; left:5px; top:0; color:var(--warn); font-weight:700;}
+
+  footer{padding:24px 56px 42px; color:var(--ink-3); font-size:12px; border-top:1px solid var(--line-2);}
+
+  @media (max-width:800px){
+    section,.cover,footer{padding-left:22px; padding-right:22px;}
+    .cover h1{font-size:23px;}
+  }
+  @media print{ body{background:#fff;} .page{box-shadow:none; max-width:none;} section{page-break-inside:avoid;} }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="cover">
+    <div class="kicker">Week 0 · Hourly Plan</div>
+    <h1>W0 任务卡 + DeepChem 项目可行性判断</h1>
+    <div class="sub">前提修正：有 Python 二级、本科写过简单程序 → W0 不是"认语法"，是"补四个工程缺口"。共 7 天，约 19 小时。</div>
+    <div class="meta">
+      <span class="chip">10/19 – 10/25</span>
+      <span class="chip">19 小时</span>
+      <span class="chip hot">交付：1 个能跑通的仓库</span>
+      <span class="chip">脚手架已生成</span>
+    </div>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <h2><span class="num">01</span>先校准：Python 二级给了你什么，没给你什么</h2>
+    <p class="lead">这一节决定 W0 要不要从"变量是什么"讲起。答案是：不用。但下面这四样，二级一个都没覆盖。</p>
+
+    <table>
+      <thead><tr><th style="width:50%">✅ 二级已经给你的（W0 不重复）</th><th style="width:50%">❌ 二级没给你的（W0 全部时间花在这）</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>
+            变量、数据类型、分支、循环<br>
+            列表 / 字典 / 元组 / 切片<br>
+            函数定义与调用<br>
+            字符串处理<br>
+            <code>open()</code> 读写文本文件<br>
+            基本算法（排序、查找）
+          </td>
+          <td>
+            <strong>① 类与继承</strong>——PyTorch 的 <code>nn.Module</code> 全靠它，不懂类就永远读不懂别人的模型代码<br>
+            <strong>② 虚拟环境与包管理</strong>——conda / pip / 为什么不能装到 base<br>
+            <strong>③ Git 与 GitHub</strong>——二级完全不考，但没有它就没有"作品"<br>
+            <strong>④ numpy / pandas / matplotlib</strong>——二级的文件读写是 <code>open()</code>，科研数据是 DataFrame
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="verdict">
+      <strong>所以 W0 的定位变了：</strong>不是"七天学会 Python"，是"七天补齐四个工程缺口，并产出一个仓库"。<br>
+      省下来的语法时间，全部加到 <strong>Day 6 的仓库组装</strong>——因为面试官看的是仓库，不是你会不会写冒泡排序。
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 2 -->
+  <section>
+    <h2><span class="num">02</span>七天任务卡</h2>
+    <p class="lead">每天只有一条验收标准。<strong>没通过验收就不要进下一天</strong>——宁可延一天，也不要带着窟窿往前走。</p>
+
+    <table>
+      <thead>
+        <tr><th style="width:11%">Day</th><th style="width:22%">任务</th><th style="width:37%">具体动作</th><th style="width:30%">验收（二值判断）</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="strong"><span class="day">Day 0</span><span class="hrs">今晚 · 1h</span></td>
+          <td>把环境装对</td>
+          <td>装 Miniconda → <code>conda create -n ai4s python=3.11</code> → 装依赖 → 跑 <code>check_env.py</code></td>
+          <td>6 行全部 <code>[OK]</code>，Python 显示 3.11.x</td>
+        </tr>
+        <tr>
+          <td class="strong"><span class="day">Day 1</span><span class="hrs">2h</span></td>
+          <td>搞懂环境隔离</td>
+          <td>理解 base / env 的区别；<code>conda activate</code>、<code>conda list</code>、<code>pip install</code>；故意把一个包装错版本再卸掉</td>
+          <td>能用自己的话解释"为什么不能把所有包都装进 base"</td>
+        </tr>
+        <tr>
+          <td class="strong"><span class="day">Day 2</span><span class="hrs">2h</span></td>
+          <td>补「类」这一课</td>
+          <td>写三个递进的类：①空的 ②带 <code>__init__</code> 的 ③继承第一个的；然后打开 PyTorch 官方 60 分钟教程，<strong>只看 nn.Module 那一段</strong></td>
+          <td>能手写一个含 <code>__init__</code>、方法、继承的类，并说清 <code>self</code> 是什么</td>
+        </tr>
+        <tr>
+          <td class="strong"><span class="day">Day 3</span><span class="hrs">2.5h</span></td>
+          <td>Git 五个命令</td>
+          <td>装 Git → 配 user.name/email → <code>init / add / commit / remote / push</code> → 建 GitHub 仓库（先 Private）→ 写 <code>.gitignore</code></td>
+          <td>本地改一个字，push 之后网页上能看到这次 commit</td>
+        </tr>
+        <tr>
+          <td class="strong"><span class="day">Day 4</span><span class="hrs">2.5h</span></td>
+          <td>pandas 十个操作</td>
+          <td><code>read_csv</code> / <code>head</code> / <code>shape</code> / <code>dtypes</code> / <code>isna().sum()</code> / <code>dropna</code> / <code>fillna</code> / <code>groupby</code> / <code>sort_values</code> / <code>to_csv</code>；然后<strong>换成你自己的数据</strong></td>
+          <td>一条命令输出"行数、列数、每列缺失数"，并说清你删了哪些行、为什么</td>
+        </tr>
+        <tr>
+          <td class="strong"><span class="day">Day 5</span><span class="hrs">2h</span></td>
+          <td>画三张图</td>
+          <td>散点、柱状+误差棒、直方图；<code>savefig(dpi=300, bbox_inches='tight')</code>；解决中文乱码</td>
+          <td><code>figures/</code> 下三个 png，每张都有轴标签、单位、图例</td>
+        </tr>
+        <tr>
+          <td class="strong"><span class="day">Day 6</span><span class="hrs">5h</span></td>
+          <td>组装成仓库</td>
+          <td>目录改成 <code>data/ src/ figures/</code>；三个脚本能独立运行；README 写四段：这是什么 / 怎么装 / 怎么跑 / 数据哪来的</td>
+          <td><strong>删掉环境，照 README 从零重建，能跑通</strong></td>
+        </tr>
+        <tr>
+          <td class="strong"><span class="day">Day 7</span><span class="hrs">2h</span></td>
+          <td>复盘与交付</td>
+          <td>写 500 字「这周卡在哪、怎么解决的」；<code>conda env export &gt; environment.yml</code>；把仓库发给一个同学让他跑</td>
+          <td>同学按 README 独立跑通（唯一有效的验收）</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr>
+
+  <!-- 3 -->
+  <section>
+    <h2><span class="num">03</span>每天的参考命令</h2>
+    <p class="lead">脚手架已经生成在 <code>w0-starter/</code> 目录。今晚从 Day 0 开始，直接复制。</p>
+
+    <h3>Day 0 · 环境</h3>
+    <pre><span class="c"># 装完 Miniconda 后，打开 Anaconda Prompt（不要用系统 cmd）</span>
+conda create -n ai4s python=3.11 -y
+conda activate ai4s
+cd D:/WorkBuddy-output/2026-10-19-18-37-44/w0-starter
+pip install -r requirements.txt
+python src/check_env.py</pre>
+
+    <div class="warnbox">
+      <div class="t">为什么一定是 3.11，不是 3.13</div>
+      DeepChem 2.8.0（2024-04 发布）声明支持 Python 3.7–3.11。在 3.12 / 3.13 上执行 <code>pip install deepchem</code>，<strong>pip 会静默地倒装成 2021 年的 2.5.0，退出码还是 0</strong>，然后 <code>import deepchem</code> 报 <code>No module named 'tensorflow'</code>。这个坑能卡掉两三天。<strong>现在就把环境定在 3.11，以后省一次重装。</strong>
+    </div>
+
+    <h3>Day 2 · 类（唯一必须补的语法）</h3>
+    <pre><span class="c"># 写三个递进的类，第三个是重点</span>
+class Catalyst:
+    def __init__(self, name, loading):
+        self.name = name          <span class="c"># self 就是"这个对象自己"</span>
+        self.loading = loading
+
+    def describe(self):
+        return f"{self.name} @ {self.loading} wt%"
+
+class SingleAtomCatalyst(Catalyst):        <span class="c"># 继承</span>
+    def __init__(self, name, loading, cn):
+        super().__init__(name, loading)     <span class="c"># 调父类的 __init__</span>
+        self.cn = cn
+
+    def describe(self):                     <span class="c"># 覆写</span>
+        return super().describe() + f", CN={self.cn}"
+
+c = SingleAtomCatalyst("Pd1/Bi2WO6", 0.8, 5)
+print(c.describe())</pre>
+
+    <p>写完这个，打开 PyTorch 官方 <em>60-Minute Blitz</em>，<strong>只找 <code>class Net(nn.Module)</code> 那几段</strong>，你会发现结构一模一样：<code>__init__</code> 里定义层，<code>forward</code> 里定义数据怎么流。不需要看懂张量运算。</p>
+
+    <h3>Day 3 · Git</h3>
+    <pre>git init
+git add .
+git commit -m "init: w0 starter"
+git branch -M main
+git remote add origin https://github.com/&lt;你的用户名&gt;/w0-starter.git
+git push -u origin main
+
+<span class="c"># 每天结束前只需这三条</span>
+git status
+git add .
+git commit -m "day4: clean demo data"</pre>
+
+    <p>认证用 Personal Access Token（GitHub → Settings → Developer settings → Tokens），密码方式已经废弃。输密码时终端不显示字符是正常的。</p>
+
+    <h3>Day 4 · pandas</h3>
+    <pre>python src/read_data.py</pre>
+    <p>脚本已经把十个操作串起来了。你要做的是<strong>把 <code>data/demo_data.csv</code> 换成自己的数据</strong>，然后在 <code>TODO</code> 段写你自己的清洗规则，每条都加一行注释说明"删了多少、为什么"。</p>
+
+    <div class="okbox">
+      <div class="t">Day 4 的隐藏考点</div>
+      面试官问的第一个问题几乎永远是"你删了哪些数据"。<code>read_data.py</code> 里已经强制打印 <code>dropped rows</code>——习惯从第一天就养起来，比任何技巧都值钱。
+    </div>
+
+    <h3>Day 5 · 画图</h3>
+    <pre>python src/make_plots.py</pre>
+    <p>三张图的代码都写好了（散点 / 分组柱状+误差棒 / 直方图）。改 <code>x</code>、<code>y</code> 两列名就能用。中文乱码已经在脚本顶部处理：<code>plt.rcParams["font.sans-serif"] = ["SimHei"]</code>。</p>
+  </section>
+
+  <hr>
+
+  <!-- 4 -->
+  <section>
+    <h2><span class="num">04</span>DeepChem 能不能"改进后当自己的项目"</h2>
+    <p class="lead">能，但要看你在哪一级。四分之一的"改进"是负资产——不是能力问题，是诚信问题，一旦被识破比没项目更糟。</p>
+
+    <h3>四级判断表</h3>
+    <table>
+      <thead><tr><th style="width:9%">级别</th><th style="width:30%">你做了什么</th><th style="width:22%">简历上能怎么写</th><th style="width:39%">面试官的反应</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="strong" style="color:var(--ink-3)">L0</td>
+          <td>把官方 tutorial 跑通，改个数据集名字</td>
+          <td><strong style="color:var(--warn)">不能写</strong></td>
+          <td>"哦，你装了环境。"——0 分，且占掉简历一行</td>
+        </tr>
+        <tr>
+          <td class="strong" style="color:var(--amber)">L1</td>
+          <td>复现 + 对齐原论文数字 + 写清差异原因</td>
+          <td>只能写"<strong>复现</strong>"，不能写"开发"</td>
+          <td>"这人能读论文、能跑代码。"——及格，可作第二个项目</td>
+        </tr>
+        <tr>
+          <td class="strong" style="color:var(--teal)">L2</td>
+          <td><strong>换成你自己的问题与数据</strong>，重建基线，做出改进，给出结论</td>
+          <td>可以写"独立完成"，注明基于某开源框架</td>
+          <td>"这才是项目。"——目标级别</td>
+        </tr>
+        <tr>
+          <td class="strong" style="color:var(--teal)">L3</td>
+          <td>给上游修 bug / 加 featurizer，PR 被 merge</td>
+          <td>"贡献者"</td>
+          <td>最强信号，但 3–6 个月才碰得到一次机会，别当主线</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>三个追问，答不出两个就不是你的项目</h3>
+    <ol style="margin:0 0 14px; padding-left:22px; font-size:14px; line-height:1.85;">
+      <li>上游那段代码是谁写的？<strong>你改了哪几个文件、哪几行？</strong></li>
+      <li>指标<strong>从多少变到多少</strong>？为什么会变？</li>
+      <li>这个改动<strong>在化学上为什么说得通</strong>？</li>
+    </ol>
+    <p>第 1 题考诚实，第 2 题考实验素养，第 3 题考你到底懂不懂自己的体系。<strong>三题里第 3 题是 CS 背景的竞争者答不了的——这正是你的位置。</strong></p>
+
+    <h3>我建议你把它做成什么</h3>
+    <div class="verdict">
+      <strong>题目：小样本化学数据上，图神经网络与分子指纹基线的系统性对比</strong><br><br>
+      <strong>数据：</strong>MoleculeNet 里三个 &lt;10K 的数据集（ESOL 1128 条 / FreeSolv 642 条 / Lipophilicity 4200 条）+ 你自己的光催化体系（转成表格回归任务）<br>
+      <strong>模型：</strong>ECFP + RandomForest（基线） vs GCN / AttentiveFP<br>
+      <strong>划分：</strong>ScaffoldSplitter（关键）<br>
+      <strong>结论：</strong>给出"多小算小"的经验门槛，和一条可复用的评测规范<br><br>
+      <strong>为什么这是好项目：</strong>DeepChem 文档自己就承认，样本量少于一 Quantity 时 GNN 常常打不过指纹基线。你在自己的体系上把这个结论<strong>量化验证</strong>——这是一个 negative result，<strong>比刷出一个好看的假高分可信得多</strong>，而且正好命中面试官最想听的那句："我知道我的方法什么时候不work。"
+    </div>
+
+    <h3>DeepChem 的真实状态（2026-09 核查）</h3>
+    <table>
+      <thead><tr><th style="width:26%">项目</th><th>实情</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">最新稳定版</td><td>2.8.0，2024-04 发布，<strong>已 29 个月无新稳定版</strong>（master 仍在动，2026-08 还有 commit）</td></tr>
+        <tr><td class="strong">Python 支持</td><td>3.7–3.11。<strong>3.12+ 会静默装成 2.5.0</strong>，报错信息完全误导</td></tr>
+        <tr><td class="strong">PyTorch 后端</td><td>支持，但要 <code>pip install 'deepchem[torch]'</code>；GNN 路径还依赖 DGL / DGL-LifeSci，版本兼容是常年坑</td></tr>
+        <tr><td class="strong">核心价值</td><td><strong>ScaffoldSplitter</strong> + MoleculeNet 标准化评测——这两样比它的模型更值钱</td></tr>
+        <tr><td class="strong">结论</td><td><strong>当"评测规范 + 基线"用，不要当主线框架。</strong>主线用 PyG 或 Chemprop（更轻、维护更活跃）</td></tr>
+      </tbody>
+    </table>
+
+    <h3>明确不要做的三件事</h3>
+    <ul class="nocheck">
+      <li>Fork 别人的 repo，改 README、加个 badge、调一下 batch_size，然后写"独立开发"——一问就穿，而且是诚信问题，比能力不足严重得多。</li>
+      <li>把官方 tutorial 跑一遍传到 GitHub 当项目——面试官一天能看五份一样的。</li>
+      <li>W0 就装 DeepChem——今晚装上大概率明天就卡在 DGL 版本地狱，第一周直接报废。<strong>Day 6 之后、仓库能跑通了再碰它。</strong></li>
+    </ul>
+  </section>
+
+  <hr>
+
+  <!-- 5 -->
+  <section>
+    <h2><span class="num">05</span>W0 结束时的交付清单</h2>
+    <ul class="check">
+      <li>一个 GitHub 仓库，公开，README 能让陌生人跑通</li>
+      <li><code>check_env.py</code> 输出 6 行 <code>[OK]</code>（Python 3.11.x）</li>
+      <li><code>data/</code> 里是你<strong>自己的</strong>数据（不是 demo），且写清了来源与行数</li>
+      <li><code>read_data.py</code> 里每一条清洗规则都有"删了多少、为什么"的注释</li>
+      <li><code>figures/</code> 里三张图，有轴标签和单位</li>
+      <li>500 字卡点记录（这是你未来面试"你遇到过什么困难"的真实素材）</li>
+      <li><code>environment.yml</code> 已导出，别人能复现你的环境</li>
+    </ul>
+
+    <div class="warnbox">
+      <div class="t">如果 Day 6 组不起来</div>
+      不是你笨，是任务切分错了。<strong>把 Day 6 拆成两天</strong>：第一天只做目录整理 + README 四段话，第二天再做"删环境重建"的验证。整个 W0 允许延到 9 天，但不允许跳过"别人能跑通"这一步——因为那一步正是这个项目唯一的价值所在。
+    </div>
+  </section>
+
+  <footer>
+    生成于 2026-10-19 ｜ 脚手架位于 <code>w0-starter/</code>，含 <code>check_env.py</code>、<code>read_data.py</code>、<code>make_plots.py</code> 与合成占位数据。<br>
+    DeepChem 版本信息核查于 2026-09 公开资料（2.8.0 为最新稳定版）；<strong>安装前请以 PyPI 实际版本为准</strong>。
+  </footer>
+
+</div>
+</body>
+</html>

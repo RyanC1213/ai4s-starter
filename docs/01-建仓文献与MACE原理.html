@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>建仓 · 文献对比 · MACE 原理</title>
+<style>
+  :root{
+    --ink:#16202e; --ink-2:#43536b; --ink-3:#7b8aa1;
+    --line:#e2e8f0; --line-2:#eef2f7;
+    --bg:#ffffff; --surface:#f7f9fc; --blue:#1d4e89; --blue-l:#2f6db5; --blue-bg:#eaf2fb;
+    --teal:#0f766e; --teal-bg:#e8f5f3; --warn:#b42318; --warn-bg:#fdf1ef; --amber:#8a5a00; --amber-bg:#fdf6e7;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:#f0f3f8; color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px; line-height:1.78; -webkit-font-smoothing:antialiased;}
+  .page{max-width:1000px; margin:0 auto; background:var(--bg); box-shadow:0 1px 3px rgba(16,32,54,.06);}
+
+  .cover{background:linear-gradient(160deg,#123a66 0%,#1d4e89 55%,#2a6ba8 100%); color:#fff; padding:46px 52px 38px;}
+  .cover .kicker{font-size:11.5px; letter-spacing:.18em; text-transform:uppercase; color:#b9d3ec; margin-bottom:12px;}
+  .cover h1{margin:0 0 10px; font-size:28px; line-height:1.34; font-weight:700;}
+  .cover .sub{font-size:14.5px; color:#d6e6f5; max-width:750px;}
+  .cover .meta{margin-top:20px; display:flex; flex-wrap:wrap; gap:9px;}
+  .chip{display:inline-block; padding:5px 11px; border-radius:100px; font-size:12px; background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.22); color:#eaf3fb;}
+  .chip.hot{background:#ffd9a8; border-color:#ffd9a8; color:#5a3a00; font-weight:600;}
+
+  section{padding:36px 52px 6px;}
+  section:last-of-type{padding-bottom:48px;}
+  h2.sh{font-size:20px; margin:0 0 6px; display:flex; align-items:baseline; gap:10px;}
+  h2.sh .num{font-size:12px; font-weight:700; color:#fff; background:var(--blue); padding:3px 9px; border-radius:5px; font-family:ui-monospace,monospace;}
+  h3{font-size:15.5px; margin:26px 0 8px;}
+  h4{font-size:14px; margin:18px 0 4px; color:var(--ink);}
+  .lead{color:var(--ink-2); margin:0 0 16px; font-size:14.5px;}
+  p{margin:0 0 12px;}
+  hr{border:0; border-top:1px solid var(--line-2); margin:32px 0 0;}
+
+  table{width:100%; border-collapse:collapse; margin:12px 0 6px; font-size:13px;}
+  th{text-align:left; font-weight:600; font-size:11px; letter-spacing:.05em; color:var(--ink-3); padding:9px 10px; border-bottom:1.5px solid var(--line); background:var(--surface);}
+  td{padding:9px 10px; border-bottom:1px solid var(--line-2); vertical-align:top; line-height:1.62;}
+  tr:last-child td{border-bottom:0;}
+  td.strong{font-weight:600;}
+  .doi{font-family:ui-monospace,monospace; font-size:11.5px; color:var(--blue-l); white-space:nowrap;}
+  .arxiv{color:var(--amber); font-size:11.5px; font-family:ui-monospace,monospace;}
+
+  pre{background:#1b2534; color:#dfe7f2; padding:13px 16px; border-radius:7px; overflow-x:auto; font-size:12.5px; line-height:1.72; margin:9px 0 11px;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;}
+  pre .c{color:#7f93ad;}
+  pre .hl{color:#8fd0ff;}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; background:var(--surface); padding:1px 5px; border-radius:4px; border:1px solid var(--line);}
+
+  .step{display:flex; gap:13px; margin:14px 0 4px; align-items:flex-start;}
+  .step .n{flex:0 0 24px; height:24px; border-radius:50%; background:var(--blue); color:#fff; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; margin-top:2px;}
+  .step .body{flex:1;}
+  .step .st{font-weight:700; font-size:14.5px;}
+  .step .sd{color:var(--ink-2); font-size:13.5px; margin-top:2px;}
+
+  .warnbox{background:var(--warn-bg); border-left:4px solid var(--warn); padding:15px 19px; border-radius:0 8px 8px 0; margin:15px 0;}
+  .warnbox .t{font-weight:700; color:var(--warn); font-size:13.5px; margin-bottom:4px;}
+  .okbox{background:var(--teal-bg); border-left:4px solid var(--teal); padding:15px 19px; border-radius:0 8px 8px 0; margin:15px 0;}
+  .okbox .t{font-weight:700; color:var(--teal); font-size:13.5px; margin-bottom:4px;}
+  .verdict{background:var(--blue-bg); border-left:4px solid var(--blue); padding:16px 20px; border-radius:0 8px 8px 0; margin:15px 0;}
+  .verdict strong{color:var(--blue);}
+
+  ol.plain{padding-left:22px; margin:8px 0 12px; font-size:14px; line-height:1.85;}
+  ul.plain{padding-left:20px; margin:8px 0 12px; font-size:14px; line-height:1.78;}
+  ul.plain li,ol.plain li{margin-bottom:6px;}
+
+  footer{padding:24px 52px 42px; color:var(--ink-3); font-size:12px; border-top:1px solid var(--line-2);}
+  @media (max-width:820px){ section,.cover,footer{padding-left:20px; padding-right:20px;} .cover h1{font-size:23px;} }
+  @media print{ body{background:#fff;} .page{box-shadow:none; max-width:none;} section{page-break-inside:avoid;} }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="cover">
+    <div class="kicker">Week 1 · GitHub / Literature / MACE</div>
+    <h1>建仓步骤 · 文献对比 · MACE 原理</h1>
+    <div class="sub">三件事一份文档。文献部分的 7 条期刊 DOI 已用 Crossref 逐条核验（2026-10-19），2 条仅有 arXiv 编号的已明确标注。</div>
+    <div class="meta">
+      <span class="chip">Step 13 配套</span>
+      <span class="chip hot">7 条 DOI 已核验</span>
+      <span class="chip">MACE 适用域分析</span>
+    </div>
+  </div>
+
+  <!-- PART 1 -->
+  <section>
+    <h2 class="sh"><span class="num">01</span>建 GitHub 仓库：从零到推上去</h2>
+
+    <div class="okbox">
+      <div class="t">先说网络</div>
+      我这边沙箱访问 <code>github.com</code> 超时，但 <code>api.github.com</code> 通。<strong>你的浏览器能打开就行</strong>——网页操作走你的网络，<code>git push</code> 走你终端里的网络，两者都不受我这边限制。<br>
+      如果 <code>git push</code> 也卡住，再考虑 Gitee 兜底（命令完全一样，只换 URL）。
+    </div>
+
+    <h3>第 1 段：网页上建仓库（3 分钟）</h3>
+
+    <div class="step"><div class="n">1</div><div class="body">
+      <div class="st">打开 github.com，确认已登录</div>
+      <div class="sd">右上角有你的头像 = 已登录。</div>
+    </div></div>
+
+    <div class="step"><div class="n">2</div><div class="body">
+      <div class="st">点右上角的 <strong>+</strong> → <strong>New repository</strong></div>
+      <div class="sd">不要点 "Import repository" 或 "New gist"。</div>
+    </div></div>
+
+    <div class="step"><div class="n">3</div><div class="body">
+      <div class="st">填三个字段</div>
+      <div class="sd">
+        <strong>Repository name</strong>：<code>ai4s-starter</code>（全小写，用连字符）<br>
+        <strong>Description</strong>：可填 <code>Bi2WO6 relaxation with MACE foundation model</code><br>
+        <strong>可见性</strong>：选 <strong>Public</strong>
+      </div>
+    </div></div>
+
+    <div class="step"><div class="n">4</div><div class="body">
+      <div class="st">下面三个勾<strong>全都不选</strong></div>
+      <div class="sd">"Add a README file"、"Add .gitignore"、"Choose a license" —— <strong>一个都别勾</strong>。<br>
+      因为你本地已经有 README 和 .gitignore 了，远程再建一个会冲突，push 时报 <code>failed to push some refs</code>。这是新手第一高频错误。</div>
+    </div></div>
+
+    <div class="step"><div class="n">5</div><div class="body">
+      <div class="st">点 <strong>Create repository</strong>，然后复制页面上的 HTTPS 地址</div>
+      <div class="sd">形如 <code>https://github.com/你的用户名/ai4s-starter.git</code>。<br>
+      页面会显示一堆命令，<strong>先别照抄</strong>——它给的初始化和我们本地已有内容重复，按下面第 2 段走。</div>
+    </div></div>
+
+    <h3>第 2 段：终端里推送（5 分钟）</h3>
+    <p style="font-size:14px;color:var(--ink-2);">在 Anaconda Prompt 里，确认在 project 目录、且提示符是 <code>(ai4s)</code>：</p>
+
+    <pre><span class="hl">cd C:\Users\Administrator\Desktop\project</span>
+<span class="hl">git --version</span>          <span class="c"># 没装就去 git-scm.com 下 Git for Windows</span>
+
+<span class="hl">git init</span>
+<span class="hl">git add .</span>
+<span class="hl">git commit -m "init: Bi2WO6 relaxation with MACE"</span>
+<span class="hl">git branch -M main</span>
+<span class="hl">git remote add origin https://github.com/你的用户名/ai4s-starter.git</span>
+<span class="hl">git push -u origin main</span></pre>
+
+    <div class="warnbox">
+      <div class="t">push 时会要密码 —— 填的是 Token，不是登录密码</div>
+      GitHub 从 2021 年起就不接受账号密码了。你要先生成 <strong>Personal Access Token</strong>：<br>
+      网页右上头像 → <strong>Settings</strong> → 左栏最下 <strong>Developer settings</strong> → <strong>Personal access tokens</strong> → <strong>Tokens (classic)</strong> → <strong>Generate new token (classic)</strong> → 填个名字、Expiration 选 90 天 → 勾选 <strong><code>repo</code></strong>（整个大类）→ 拉到最下 Generate。<br><br>
+      <strong>⚠️ Token 只显示一次</strong>，刷新就看不到了。复制下来存到记事本。<br>
+      终端提示 <code>Username</code> 填 GitHub 用户名，<code>Password</code> 粘贴 Token（<strong>输入时不显示字符，是正常的</strong>）。
+    </div>
+
+    <h3>第 3 段：验证</h3>
+    <p>刷新仓库页面，应该看到 <code>README.md</code>、<code>src/</code>、<code>data/</code>、<code>docs/</code>。</p>
+
+    <div class="okbox">
+      <div class="t">你会注意到两个东西没上传，这是对的</div>
+      <code>data/relaxed/</code>（计算结果）和 <code>sync.bat</code>（含本机绝对路径）都被 <code>.gitignore</code> 排除了。<br>
+      <strong>计算结果不进仓库是行规</strong>——几 GB 的轨迹会把仓库撑爆，而且别人不需要你的中间产物。要分享就发 <code>.cif</code> 和 <code>.traj</code> 的压缩包。
+    </div>
+
+    <h3>第 4 段：报错对照</h3>
+    <table>
+      <thead><tr><th style="width:42%">报错</th><th style="width:58%">修法</th></tr></thead>
+      <tbody>
+        <tr><td><code>remote origin already exists</code></td><td><code>git remote remove origin</code> 后重新 add</td></tr>
+        <tr><td><code>Authentication failed</code></td><td>密码处填 Token；用户名别填邮箱</td></tr>
+        <tr><td><code>src refspec main does not match any</code></td><td>还没 commit。先 <code>git add . &amp;&amp; git commit -m "..."</code></td></tr>
+        <tr><td><code>failed to push some refs</code> / <code>rejected</code></td><td>远程有 README（第 4 步勾了）。<code>git pull --rebase origin main</code> 后重推</td></tr>
+        <tr><td><code>fatal: not a git repository</code></td><td>不在 project 目录，或没跑 <code>git init</code></td></tr>
+        <tr><td><code>git push</code> 卡住不动</td><td>网络。改用 SSH（<code>git remote set-url</code> 换 git@github.com:...），或换 Gitee</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr>
+
+  <!-- PART 2 -->
+  <section>
+    <h2 class="sh"><span class="num">02</span>文献对比：通用势函数这条线是怎么走过来的</h2>
+    <p class="lead">按时间顺序排，每条都说明"它解决了什么、对你有什么影响"。DOI 已逐条核验。</p>
+
+    <table>
+      <thead>
+        <tr><th style="width:22%">文献</th><th style="width:20%">出处 / DOI</th><th style="width:29%">它做了什么</th><th style="width:29%">对你项目的意义</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="strong">OC20 数据集</td>
+          <td>ACS Catal. 2021<br><span class="doi">10.1021/acscatal.0c04525</span></td>
+          <td>催化领域第一个大规模 DFT 数据集 + 公开竞赛，把"吸附能预测"变成可比较的基准。</td>
+          <td>你现在做的吸附能计算，评价标准就来自这里。<strong>做催化 AI，绕不开它。</strong></td>
+        </tr>
+        <tr>
+          <td class="strong">NequIP</td>
+          <td>Nat. Commun. 2022<br><span class="doi">10.1038/s41467-022-29939-5</span></td>
+          <td>E(3) 等变图神经网络。关键结论：<strong>把对称性写进网络结构，数据效率大幅提升</strong>。</td>
+          <td>MACE 的思想前身。"等变"这个词，就是从这里变成主流的。</td>
+        </tr>
+        <tr>
+          <td class="strong">M3GNet</td>
+          <td>Nat. Comput. Sci. 2022<br><span class="doi">10.1038/s43588-022-00349-3</span></td>
+          <td>面向周期表的通用图势函数，能直接做结构弛豫。</td>
+          <td>证明"一个模型覆盖全周期表"可行。<strong>现已停更</strong>（并入 MatGL）。</td>
+        </tr>
+        <tr>
+          <td class="strong">MACE（原始方法）</td>
+          <td>NeurIPS 2022<br><span class="arxiv">arXiv:2206.07697<br>（无期刊 DOI）</span></td>
+          <td>提出<strong>高阶（多体）等变消息传递</strong>：一层内显式构造 3 体/4 体项，层数更少但感受野相同。</td>
+          <td><strong>你现在用的就是这个架构。</strong>下面第 3 部分讲透。</td>
+        </tr>
+        <tr>
+          <td class="strong">Allegro</td>
+          <td>Nat. Commun. 2023<br><span class="doi">10.1038/s41467-023-36329-y</span></td>
+          <td>严格局域的等变表示，可扩展到大规模分子动力学。</td>
+          <td>说明"<strong>局域性</strong>"是速度的关键——这也是你能在 8 GB 卡上跑起来的原因。</td>
+        </tr>
+        <tr>
+          <td class="strong">CHGNet</td>
+          <td>Nat. Mach. Intell. 2023<br><span class="doi">10.1038/s42256-023-00716-3</span></td>
+          <td>电荷感知的通用势，用 Materials Project 轨迹（MPtrj）预训练，能预测磁矩。</td>
+          <td>和 MACE 同代、同数据源。<strong>现已是 legacy 仓库</strong>（主线迁到 MatGL），别当项目主体。</td>
+        </tr>
+        <tr>
+          <td class="strong">MACE-MP-0 基础模型</td>
+          <td>arXiv 2023<br><span class="arxiv">arXiv:2401.00096<br>（无期刊 DOI）</span></td>
+          <td>在 MPtrj 上训练的"材料版通用势"，覆盖 89 种元素，无需微调即可零样本使用。</td>
+          <td><strong>你 <code>mace_mp()</code> 加载的就是它。</strong>零样本可用，但精度不等于 DFT。</td>
+        </tr>
+        <tr>
+          <td class="strong">MACE 基础模型基准<br>（双钙钛矿）</td>
+          <td>Phys. Chem. Chem. Phys. 2026, 28(7), 4459–4469<br><span class="doi">10.1039/d5cp04693a</span></td>
+          <td>用约 2000 个立方双钙钛矿，横评 4 个 MACE 变体的动力学稳定性预测。</td>
+          <td><strong>三条对你直接有用的结论：</strong>① 训练数据越多越准；② 弱非谐体系准，强非谐/不稳定体系差；③ <strong>误差主要来自"力误差被 Hessian 二阶放大"</strong>。</td>
+        </tr>
+        <tr>
+          <td class="strong">微调统一基础 MLIP</td>
+          <td>J. Phys. Chem. Lett. 2026, 17(11), 3152–3162<br><span class="doi">10.1021/acs.jpclett.5c03801</span></td>
+          <td>横评 MACE / GRACE / SevenNet / MatterSim / ORB 五个框架、7 个化合物，比较零样本与微调。</td>
+          <td><strong>核心数字：微调后力误差降低 5–15 倍，能量误差降低 2–4 个数量级。</strong>零样本模型存在架构相关的系统偏差。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="verdict">
+      <strong>把这条线串起来看，只有一句话：</strong>通用势函数的进步，是从"手工描述符"→"等变网络"→"多体消息"→"大规模预训练"→"微调适配"的一条链。<br>
+      你现在站在链条的末端：<strong>拿一个别人训好的模型，用在你自己的体系上。</strong>这既是 2026 年最容易的起点，也是最容易出错的地方——因为模型不会告诉你它错了。
+    </div>
+
+    <h3>这三条结论，直接影响你怎么用 MACE</h3>
+    <ol class="plain">
+      <li><strong>别把 zero-shot 当 DFT 用。</strong>JPCL 2026 明确写了：基础模型存在架构相关的系统偏差，微调后力误差才能降 5–15 倍。<strong>你的 W1 结果（−6.601 eV/atom）只能说明"流程通了"，不能说明"数值准"。</strong></li>
+      <li><strong>你关心的量，恰好对力最敏感。</strong>PCCP 2026 指出误差主要来自力误差经 Hessian 放大。而吸附能、反应路径、声子，全都依赖力。<strong>做这些量之前，必须先做误差评估。</strong></li>
+      <li><strong>Bi 是重元素，在训练集里属于少数。</strong>MACE-MP 的元素覆盖不均，重元素 + 氧化物缺陷构型的样本更少。<strong>这正是你可以做的那篇"适用域研究"的立足点。</strong></li>
+    </ol>
+  </section>
+
+  <hr>
+
+  <!-- PART 3 -->
+  <section>
+    <h2 class="sh"><span class="num">03</span>MACE 原理：它到底在算什么</h2>
+
+    <h3>3.1 一句话定义</h3>
+    <p>MACE 是一个<strong>从原子坐标直接算出能量的函数</strong>。给它一堆原子的种类和位置，它输出一个总能量；力则通过对能量求导得到。</p>
+
+    <pre><span class="c"># 概念上它就是一个函数</span>
+E = MACE(元素类型[], 坐标[])          <span class="c"># 输出：总能量，单位 eV</span>
+F = -dE/dr                            <span class="c"># 输出：每个原子的受力，单位 eV/Å</span></pre>
+
+    <div class="okbox">
+      <div class="t">为什么"力 = 能量对坐标的导数"这件事这么重要</div>
+      因为这样<strong>能量自动守恒</strong>。跑分子动力学时，体系不会莫名其妙地升温或降温。<br>
+      有些模型（如早期的某些 NN 势）直接预测力，训练更简单，但跑长时间 MD 会漂移。<strong>MACE 走的是"保守力"路线。</strong>
+    </div>
+
+    <h3>3.2 三块积木</h3>
+
+    <h4>积木一：把"邻居在哪、多远"变成向量（边特征）</h4>
+    <p>对中心原子 i 和邻居 j，有两个信息：距离 <code>r_ij</code> 和方向 <code>r̂_ij</code>。</p>
+    <ul class="plain">
+      <li><strong>距离</strong> → 用一组径向基函数展开（类似把"3.2 Å"编码成一串数）</li>
+      <li><strong>方向</strong> → 用<strong>球谐函数</strong> Y<sub>lm</sub> 展开（就是化学里原子轨道的角向部分，同一套数学）</li>
+      <li>两者相乘 → 得到"<strong>等变特征</strong>"，分 l = 0, 1, 2, … 不同阶</li>
+    </ul>
+    <p>「等变」的意思是：你把整个分子旋转一下，这些特征会<strong>按规则跟着旋转</strong>，而不是乱变。这样网络就不需要靠数据去学"旋转不变性"——它天生就有。</p>
+
+    <h4>积木二：消息传递（MACE 的核心创新）</h4>
+    <p>普通 GNN 每传一层，信息多走一个键的距离。要让中心原子"感知"到 4 体相互作用（i, j, k, l），得堆 3 层。</p>
+    <p><strong>MACE 的做法：在同一层内，把邻居两两配对做张量积</strong>，直接构造出 3 体、4 体的项。</p>
+    <pre><span class="c"># 两体消息：只用到 i-j 这一条边</span>
+m_ij = RBF(r_ij) ⊗ Y_lm(r̂_ij)
+
+<span class="c"># 多体消息：把 j、k 两个邻居的边特征组合起来</span>
+m_i(jk) = m_ij ⊗ m_ik        <span class="c"># 张量积 → 直接含 i-j-k 三体信息</span>
+                              <span class="c"># 再配一层就够到四体</span></pre>
+    <p>代价是单层计算更贵，但<strong>总层数从 3–4 层降到 2 层</strong>。而层数少意味着：误差不逐层累积、显存占用低、推理快。</p>
+
+    <h4>积木三：读出能量</h4>
+    <p>每个原子把周围信息汇总成一个<strong>标量</strong>（只取 l = 0 的那一阶，因为能量是旋转不变的标量），得到单原子能量 E<sub>i</sub>。总能量就是求和：</p>
+    <pre>E_total = Σ_i E_i</pre>
+    <p>这个求和隐含一个假设：<strong>能量是局域的</strong>——一个原子的能量只取决于它周围 5–6 Å 内的环境。这条假设让计算量随原子数<strong>线性增长</strong>，而 DFT 是三次方。<strong>这才是"快"的根本原因，不是网络结构。</strong></p>
+
+    <h3>3.3 你加载的到底是哪个模型</h3>
+    <table>
+      <thead><tr><th style="width:26%">模型</th><th style="width:24%">训练数据</th><th style="width:50%">什么时候用</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">MACE-MP-0<br><span style="font-weight:400;color:var(--ink-3);font-size:12px">你正在用的</span></td><td>MPtrj（Materials Project 轨迹，约 150 万构型，89 元素）</td><td>无机固体、氧化物、金属。<strong>你的 Bi₂WO₆ 属于这一类。</strong>模型分 small / medium / large，你现在用 medium。</td></tr>
+        <tr><td class="strong">MACE-OFF</td><td>有机分子数据</td><td>纯有机体系、药物分子。不适合含 Bi 的氧化物。</td></tr>
+        <tr><td class="strong">MACE-Polar</td><td>含偶极/极化数据</td><td>需要红外、介电响应时用。你现在不需要。</td></tr>
+      </tbody>
+    </table>
+
+    <h3>3.4 五个局限（面试一定会问）</h3>
+
+    <div class="warnbox">
+      <div class="t">1. 它不知道电子结构</div>
+      只给能量和力，<strong>不给带隙、不给电荷、不给能带位置</strong>。而光催化的核心恰恰是 band alignment（导带/价带位置决定能不能还原/氧化）。<strong>这是 MACE 在你课题上的硬边界</strong>——它能帮你算结构和吸附能，不能帮你算光吸收。
+    </div>
+
+    <div class="warnbox">
+      <div class="t">2. 分布外会静默失效</div>
+      遇到训练集里没见过的构型，它<strong>不会报错，只会给你一个看起来合理的错数字</strong>。这是通用势函数最危险的地方，也是为什么"适用域研究"本身就是一个正经课题。
+    </div>
+
+    <div class="warnbox">
+      <div class="t">3. 元素覆盖不均</div>
+      Materials Project 里 Bi 的化合物数量远少于 Si、Al、Fe。重元素 + 复杂氧化物 + 缺陷的组合，样本更稀。<strong>你的体系正好在稀疏区。</strong>
+    </div>
+
+    <div class="warnbox">
+      <div class="t">4. 没有长程静电</div>
+      截断半径之外的信息全部丢失。对离子性强的氧化物（Bi₂WO₆ 就是），非局域电荷效应是有影响的。MACE-Polar 部分弥补，但你现在没用。
+    </div>
+
+    <div class="warnbox">
+      <div class="t">5. 自旋和氧化态不显式</div>
+      CHGNet 那类"电荷感知"模型能预测磁矩，MACE-MP-0 不行。如果你的 Pd 单原子有自旋态变化，这一块它是盲的。
+    </div>
+
+    <h3>3.5 怎么判断它给你的数靠不靠谱（三条实操）</h3>
+    <ol class="plain">
+      <li><strong>抽 5–10 个构型做 DFT 单点对比。</strong>不用全做，抽样即可。看能量差是否在你可接受的窗口内（比如 &lt;20 meV/atom）。<strong>这是最硬的一条证据，面试时说出来分量很重。</strong></li>
+      <li><strong>算能量-体积曲线（EOS）。</strong>把晶胞压缩/膨胀几个点，看曲线形状是否合理、平衡体积是否接近实验。曲线歪了说明势函数在这个体系上不可信。</li>
+      <li><strong>看力的连续性。</strong>把某个原子轻微挪动，力应该是连续变化的。出现跳变说明落到了训练分布外。</li>
+    </ol>
+
+    <div class="verdict">
+      <strong>如果你只记住一句话：</strong>MACE 是一个<strong>插值器</strong>，不是求解器。它在训练数据覆盖的空间里非常准、非常快；一旦走出那个空间，它会安静地骗你。<br>
+      所以真正的专业能力不是"会用 MACE"，而是<strong>"知道什么时候不该信它"</strong>。这句话，就是你面试时区别于其他候选人的地方。
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- PART 4 -->
+  <section>
+    <h2 class="sh"><span class="num">04</span>今晚和接下来两周</h2>
+
+    <table>
+      <thead><tr><th style="width:14%">时间</th><th style="width:46%">做什么</th><th style="width:40%">交付物</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">今晚</td><td>按第 1 部分建 GitHub 仓库并推上去</td><td>一个可访问的公开链接</td></tr>
+        <tr><td class="strong">今晚</td><td>写 <code>docs/week1-notes.md</code>（500 字，五个问题）</td><td>面试素材的原型</td></tr>
+        <tr><td class="strong">W2 上半</td><td>晶胞弛豫（<code>ExpCellFilter</code>），和实验晶格常数对比</td><td>"我的模型把 a 轴算大了 x%" —— 这就是适用域研究的第一个数据点</td></tr>
+        <tr><td class="strong">W2 下半</td><td>沿 c 轴切 (001) 面，加 15 Å 真空层，做 2×2 slab</td><td>表面模型</td></tr>
+        <tr><td class="strong">W3</td><td>放一个 Pd 原子，算吸附能；抽 3–5 个构型做 DFT 对比（找组里会 VASP 的人）</td><td><strong>这才是你第一个真正的科学结果</strong></td></tr>
+      </tbody>
+    </table>
+
+    <div class="okbox">
+      <div class="t">W3 结束时你就有了一个完整故事</div>
+      "我用 MACE 把 Bi₂WO₆ 的表面吸附能算出来了，速度比 DFT 快三个数量级；但我在 5 个构型上和 DFT 对比，发现 Pd 位点的误差是 xx meV，说明这个体系在 MPtrj 里样本不足，需要微调。"<br><br>
+      <strong>这段话同时证明了四件事：</strong>你会用工具、你懂化学、你会验证、你知道边界在哪。<strong>这比"我复现了一个 GitHub 项目"强十倍。</strong>
+    </div>
+  </section>
+
+  <footer>
+    生成于 2026-10-19 ｜ 文献 DOI 均经 Crossref API 逐条核验（返回 200 且标题匹配）。<br>
+    标注 <span style="color:var(--amber)">arXiv</span> 的两条为预印本，无期刊 DOI；如需引用请以 arXiv 编号为准，<strong>不要臆造 DOI</strong>。<br>
+    MACE 架构描述基于原始论文与官方文档；具体超参数以 <code>mace-torch 0.3.x</code> 实际代码为准。
+  </footer>
+
+</div>
+</body>
+</html>

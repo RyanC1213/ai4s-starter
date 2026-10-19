@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI4Science 材料/催化开源项目选型报告</title>
+<style>
+  :root{
+    --ink:#16202e; --ink-2:#43536b; --ink-3:#7b8aa1;
+    --line:#e2e8f0; --line-2:#eef2f7;
+    --bg:#ffffff; --surface:#f7f9fc; --blue:#1d4e89; --blue-l:#2f6db5; --blue-bg:#eaf2fb;
+    --teal:#0f766e; --teal-bg:#e8f5f3; --warn:#b42318; --warn-bg:#fdf1ef; --amber:#8a5a00; --amber-bg:#fdf6e7;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:#f0f3f8; color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px; line-height:1.75; -webkit-font-smoothing:antialiased;}
+  .page{max-width:1000px; margin:0 auto; background:var(--bg); box-shadow:0 1px 3px rgba(16,32,54,.06);}
+
+  .cover{background:linear-gradient(160deg,#123a66 0%,#1d4e89 55%,#2a6ba8 100%); color:#fff; padding:46px 54px 38px;}
+  .cover .kicker{font-size:11.5px; letter-spacing:.18em; text-transform:uppercase; color:#b9d3ec; margin-bottom:12px;}
+  .cover h1{margin:0 0 10px; font-size:28px; line-height:1.35; font-weight:700;}
+  .cover .sub{font-size:14.5px; color:#d6e6f5; max-width:740px;}
+  .cover .meta{margin-top:22px; display:flex; flex-wrap:wrap; gap:9px;}
+  .chip{display:inline-block; padding:5px 11px; border-radius:100px; font-size:12px; background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.22); color:#eaf3fb;}
+  .chip.hot{background:#ffd9a8; border-color:#ffd9a8; color:#5a3a00; font-weight:600;}
+
+  section{padding:36px 54px 6px;}
+  section:last-of-type{padding-bottom:48px;}
+  h2{font-size:20px; margin:0 0 6px; display:flex; align-items:baseline; gap:10px;}
+  h2 .num{font-size:12px; font-weight:700; color:var(--blue-l); background:var(--blue-bg); padding:3px 8px; border-radius:5px;}
+  h3{font-size:15.5px; margin:24px 0 6px;}
+  .lead{color:var(--ink-2); margin:0 0 18px; font-size:14.5px;}
+  p{margin:0 0 12px;}
+  hr{border:0; border-top:1px solid var(--line-2); margin:32px 0 0;}
+
+  table{width:100%; border-collapse:collapse; margin:12px 0 6px; font-size:13px;}
+  th{text-align:left; font-weight:600; font-size:11px; letter-spacing:.05em; color:var(--ink-3); text-transform:uppercase; padding:9px 10px; border-bottom:1.5px solid var(--line); background:var(--surface);}
+  td{padding:9px 10px; border-bottom:1px solid var(--line-2); vertical-align:top; line-height:1.6;}
+  tr:last-child td{border-bottom:0;}
+  td.strong{font-weight:600;}
+  .rank{display:inline-block; width:18px; height:18px; border-radius:4px; color:#fff; font-size:11px; font-weight:700; text-align:center; line-height:18px;}
+  .r1{background:#0f766e;} .r2{background:#2f6db5;} .r3{background:#8a5a00;}
+  .r4{background:#b4b2a9;} .r0{background:#d9534f;}
+  .dot{display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:4px; vertical-align:1px;}
+  .dg{background:#0f766e;} .da{background:#c99a2e;} .dr{background:#b42318;}
+
+  .verdict{background:var(--blue-bg); border-left:4px solid var(--blue); padding:17px 20px; border-radius:0 8px 8px 0; margin:16px 0;}
+  .verdict strong{color:var(--blue);}
+  .warnbox{background:var(--warn-bg); border-left:4px solid var(--warn); padding:15px 19px; border-radius:0 8px 8px 0; margin:15px 0;}
+  .warnbox .t{font-weight:700; color:var(--warn); font-size:13.5px; margin-bottom:4px;}
+  .okbox{background:var(--teal-bg); border-left:4px solid var(--teal); padding:15px 19px; border-radius:0 8px 8px 0; margin:15px 0;}
+  .okbox .t{font-weight:700; color:var(--teal); font-size:13.5px; margin-bottom:4px;}
+
+  pre{background:#1b2534; color:#dfe7f2; padding:13px 16px; border-radius:7px; overflow-x:auto; font-size:12.5px; line-height:1.7; margin:9px 0 11px;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;}
+  pre .c{color:#7f93ad;}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; background:var(--surface); padding:1px 5px; border-radius:4px; border:1px solid var(--line);}
+
+  .cards{display:grid; grid-template-columns:1fr; gap:14px; margin-top:12px;}
+  .pcard{border:1px solid var(--line); border-radius:10px; padding:18px 20px; background:#fff;}
+  .pcard.top{border-color:#9ec7bb; background:#fbfdfc;}
+  .pcard .hd{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;}
+  .pcard .nm{font-size:15.5px; font-weight:700;}
+  .pcard .tg{font-size:11px; padding:2px 8px; border-radius:100px; background:var(--surface); border:1px solid var(--line); color:var(--ink-2);}
+  .pcard .tg.g{background:var(--teal-bg); border-color:#b9ddd4; color:var(--teal);}
+  .pcard .tg.b{background:var(--blue-bg); border-color:#bcd7ef; color:var(--blue);}
+  .pcard .meta{color:var(--ink-3); font-size:12px; margin:4px 0 10px;}
+  .pcard .row{margin:5px 0; font-size:13.5px;}
+  .pcard .k{color:var(--ink-3); font-size:12px; letter-spacing:.04em; display:block; margin-top:8px;}
+  .pcard .v{font-size:13.5px; color:var(--ink);}
+
+  ul.plain{padding-left:20px; margin:8px 0 12px; font-size:14px;}
+  ul.plain li{margin-bottom:6px;}
+
+  footer{padding:24px 54px 42px; color:var(--ink-3); font-size:12px; border-top:1px solid var(--line-2);}
+  @media (max-width:820px){ section,.cover,footer{padding-left:20px; padding-right:20px;} .cover h1{font-size:23px;} }
+  @media print{ body{background:#fff;} .page{box-shadow:none; max-width:none;} section{page-break-inside:avoid;} }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="cover">
+    <div class="kicker">Project Shortlist · Materials &amp; Catalysis</div>
+    <h1>AI4Science 开源项目选型报告</h1>
+    <div class="sub">筛选标准：近 6 个月有提交 · 带预训练权重 · CPU 可跑 · 有明确可插拔扩展点。共筛 14 个，推荐 3 个，给出 20 周三阶路线。</div>
+    <div class="meta">
+      <span class="chip">核查日期 2026-10-19</span>
+      <span class="chip hot">CHGNet 已转 legacy，别再选它</span>
+      <span class="chip">3 个首选</span>
+    </div>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <h2><span class="num">01</span>先说三个已过时的推荐</h2>
+    <p class="lead">网上的 AI4S 项目清单大多是 2024–2025 年写的，现在直接照抄会踩坑。这三个变化必须知道：</p>
+
+    <table>
+      <thead><tr><th style="width:22%">项目</th><th style="width:34%">常见说法</th><th style="width:44%">2026-10 的实际情况</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="strong">CHGNet</td>
+          <td>"入门首选，pip install chgnet 就能用"</td>
+          <td><strong style="color:var(--warn)">已转 legacy</strong>。维护主线迁到 <strong>MatGL</strong> 仓库，本仓库只修关键 bug。最后一次提交 2026-09-15 是加 Intel XPU 支持。<br>用它学概念可以，但<b>不能当项目主体</b>——面试官会问"你在维护一个已归档的项目？"</td>
+        </tr>
+        <tr>
+          <td class="strong">M3GNet</td>
+          <td>"材料 GNN 的经典"</td>
+          <td><strong style="color:var(--warn)">已停止维护</strong>（第三方榜单直接标了停止标记）。同样并入 MatGL 生态。</td>
+        </tr>
+        <tr>
+          <td class="strong">DeepChem</td>
+          <td>"分子 ML 万能工具链"</td>
+          <td>稳定版 2.8.0 是 <strong>2024-04</strong> 发的，29 个月没更新；Python 3.12+ 会静默装成 2021 年的 2.5.0。当评测规范可以，当主线不行。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="warnbox">
+      <div class="t">由此得出一条选型铁律</div>
+      <strong>不要选"最火的"，要选"还在主线的"。</strong>一个 2023 年的明星项目，到 2026 年很可能已经是别人仓库里的 legacy 分支。判断方法很简单：看 <code>Commits</code> 页最新一条的日期，超过 6 个月不动就放弃。
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 2 -->
+  <section>
+    <h2><span class="num">02</span>候选清单（14 个，按推荐度）</h2>
+    <p class="lead">星数为第三方榜单的近似值，重点是"最近更新"和"你能改成什么"两列。硬件一栏指<strong>推理</strong>需求，训练另算。</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:5%">#</th><th style="width:19%">项目</th><th style="width:13%">最近更新</th>
+          <th style="width:9%">许可</th><th style="width:11%">硬件</th><th style="width:43%">你能把它改成什么</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="rank r1">1</span></td>
+          <td class="strong">ChemGraph<br><span style="font-weight:400;color:var(--ink-3);font-size:11.5px">Argonne 国家实验室</span></td>
+          <td><span class="dot dg"></span>2026-10-19<br><span style="color:var(--ink-3);font-size:11.5px">（今天）</span></td>
+          <td>Apache-2.0</td>
+          <td>CPU 可跑<br><span style="font-size:11.5px;color:var(--ink-3)">MACE/EMT</span></td>
+          <td>LLM 智能体框架，把自然语言变成计算化学工作流。有 <strong>MCP 服务器</strong>和 <strong>Skills 目录机制</strong>，加一个技能不用改核心代码。<br><strong>你可以：</strong>写一个 <code>photocatalysis</code> 技能——把你的实验流程（配气、取样、GC 分析、产率计算）封装成 Agent 可调用的工具链。</td>
+        </tr>
+        <tr>
+          <td><span class="rank r1">2</span></td>
+          <td class="strong">MLIP Arena<br><span style="font-weight:400;color:var(--ink-3);font-size:11.5px">atomind-ai</span></td>
+          <td><span class="dot da"></span>2026-06-16</td>
+          <td>Apache-2.0</td>
+          <td>CPU 可跑<br><span style="font-size:11.5px;color:var(--ink-3)">小体系</span></td>
+          <td>MLIP 的公平评测平台，NeurIPS 2025 Spotlight。任务含 OPT / EOS / MD / PHONON / NEB / ELASTICITY。<br><strong>你可以：</strong>给它加一个新基准——氧化物表面或单原子位点的评测集。不用训模型，只需要严谨。<strong>这是"数据/评测岗"最直接的敲门砖。</strong></td>
+        </tr>
+        <tr>
+          <td><span class="rank r1">3</span></td>
+          <td class="strong">MACE<br><span style="font-weight:400;color:var(--ink-3);font-size:11.5px">ACEsuit，剑桥</span></td>
+          <td><span class="dot dg"></span>2026-10-15</td>
+          <td>MIT</td>
+          <td>CPU 可跑<br><span style="font-size:11.5px;color:var(--ink-3)">小体系慢</span></td>
+          <td>最主流的等变势函数框架，带 MACE-MP / MACE-OFF / MACE-Polar 预训练模型，1,879 次提交。<br><strong>你可以：</strong>用 MACE-MP 算你体系的表面弛豫与吸附能，和文献 DFT 值做系统对比。<strong>⚠️ 注意：v0.3.x 是受支持线，v1.0 正在 <code>mace-reforge</code> 分支重写且不兼容，务必锁版本。</strong></td>
+        </tr>
+        <tr>
+          <td><span class="rank r2">4</span></td>
+          <td class="strong">FAIRChem / UMA<br><span style="font-weight:400;color:var(--ink-3);font-size:11.5px">Meta FAIR</span></td>
+          <td><span class="dot dg"></span>2026-09-24<br><span style="font-size:11.5px;color:var(--ink-3)">v2.23.0</span></td>
+          <td>代码 MIT<br><span style="font-size:11.5px;color:var(--warn)">权重需申请</span></td>
+          <td>建议 GPU<br><span style="font-size:11.5px;color:var(--ink-3)">torch 2.13 强锁</span></td>
+          <td>催化方向<strong>最权威</strong>：OC20 / OC22 / OC25（首次引入显式溶剂）/ OMat24 / OMol25，5 亿+ DFT 计算。<br><strong>你可以：</strong>用 UMA 做你的体系的高通量筛选。<strong>但门槛高</strong>：权重在 HuggingFace 需人工审核放行，torch 版本强锁，新手期碰会卡死。</td>
+        </tr>
+        <tr>
+          <td><span class="rank r2">5</span></td>
+          <td class="strong">deepmd-kit / DPA-2<br><span style="font-weight:400;color:var(--ink-3);font-size:11.5px">深势科技</span></td>
+          <td><span class="dot dg"></span>2026-09</td>
+          <td>LGPL-3.0</td>
+          <td>CPU 可跑</td>
+          <td>国内生态最强，中文文档最全，conda 下载 330 万次。<strong>如果你想去深势科技，这是最对口的工具链</strong>——面试聊得起来。学习曲线比 MACE 陡，训练流程偏工程。</td>
+        </tr>
+        <tr>
+          <td><span class="rank r3">6</span></td>
+          <td class="strong">MatGL</td>
+          <td><span class="dot dg"></span>活跃</td>
+          <td>BSD</td>
+          <td>CPU 可跑</td>
+          <td>M3GNet / CHGNet 的<strong>现任维护仓库</strong>，含更高精度检查点。想用 CHGNet 就来这里，别去 legacy 仓库。</td>
+        </tr>
+        <tr>
+          <td><span class="rank r4">7</span></td>
+          <td class="strong">MatterSim<br><span style="font-size:11.5px;color:var(--ink-3)">微软</span></td>
+          <td><span class="dot da"></span>2026 上半年</td>
+          <td>MIT</td>
+          <td>建议 GPU</td>
+          <td>跨元素/温度/压力的原子模拟，材料热力学与相图。功能强但代码重，不适合第一次上手。</td>
+        </tr>
+        <tr>
+          <td><span class="rank r4">8</span></td>
+          <td class="strong">Orb / SevenNet / PET-MAD / GRACE</td>
+          <td><span class="dot da"></span>多在更新</td>
+          <td>各异</td>
+          <td>CPU 可跑</td>
+          <td>都是通用势函数，能力高度同质。除非你要做"多模型横评"，否则选一个就够，别都试。</td>
+        </tr>
+        <tr>
+          <td><span class="rank r4">9</span></td>
+          <td class="strong">PaddleMaterials<br><span style="font-size:11.5px;color:var(--ink-3)">百度飞桨</span></td>
+          <td><span class="dot dg"></span>2026-09-04</td>
+          <td>Apache-2.0</td>
+          <td>CPU/GPU</td>
+          <td>中文文档友好，材料性质预测 + 结构生成一体。生态相对封闭，社区资料少于 PyTorch 系。</td>
+        </tr>
+        <tr>
+          <td><span class="rank r4">10</span></td>
+          <td class="strong">GPTFF / OpenGEM26<br><span style="font-size:11.5px;color:var(--ink-3)">中科院东莞材料所</span></td>
+          <td><span class="dot dg"></span>2026-07</td>
+          <td>开源</td>
+          <td>CPU 可跑</td>
+          <td>国产小分子力场 + 数据集，2026-07 发布，很新。适合"新项目、竞争者少"的策略，但社区几乎为零，卡住没人问。</td>
+        </tr>
+        <tr>
+          <td><span class="rank r4">11</span></td>
+          <td class="strong">GDPy<br><span style="font-size:11.5px;color:var(--ink-3)">主动学习工作流</span></td>
+          <td><span class="dot dg"></span>2026-10-03</td>
+          <td>—</td>
+          <td>CPU 可跑</td>
+          <td>用 Python 自动生成 Deep Potential，含蒙特卡洛采样。小众但方向好（主动学习），适合做第二项目。</td>
+        </tr>
+        <tr>
+          <td><span class="rank r0">—</span></td>
+          <td class="strong">uMLIP / 榜单类工具</td>
+          <td><span class="dot dg"></span>活跃</td>
+          <td>MIT</td>
+          <td>—</td>
+          <td>是"工具的工具"（GUI、汇总脚本），<strong>不能当项目</strong>。可以用来快速试多个模型，但写进简历会被看穿。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr>
+
+  <!-- 3 -->
+  <section>
+    <h2><span class="num">03</span>三个首选，展开说</h2>
+
+    <div class="cards">
+
+      <div class="pcard top">
+        <div class="hd">
+          <span class="rank r1">1</span>
+          <span class="nm">ChemGraph</span>
+          <span class="tg g">最推荐 · 对应 C 类岗</span>
+          <span class="tg">Apache-2.0</span>
+          <span class="tg b">2026-10-19 更新</span>
+        </div>
+        <div class="meta">Argonne 国家实验室 · 1,277 commits · Python ≥3.11 · Communications Chemistry 9, 33 (2026)</div>
+
+        <div class="k">它是什么</div>
+        <div class="v">把自然语言请求转成计算化学工作流的 Agent 框架。底层是 LangGraph + ASE + RDKit + MCP。有四种用法：命令行、Python API、Streamlit 界面、MCP 服务器。内置 EMT / MACE / UMA / xTB / NWChem / ORCA 等后端。</div>
+
+        <div class="k">为什么适合你</div>
+        <div class="v">① 它是<strong>今天还在提交</strong>的项目，不存在"选了就过时"的风险；② 它正好是 AISI"科研仪器智能体"和深势"Uni-Lab"那类岗位的技术原型——<strong>你做过这个，面试时你说的话和他们 JD 是同一种语言</strong>；③ Apache-2.0，可以放心改；④ Skills 机制让你<b>加功能不用碰核心</b>，这对新手是决定性的。</div>
+
+        <div class="k">你能改成什么（这就是"自己的项目"）</div>
+        <div class="v">写一个 <code>photocatalysis</code> 技能：把你的实验流程拆成 Agent 可调用的工具——<code>load_catalyst_structure()</code>、<code>estimate_band_edge()</code>、<code>compute_adsorption_energy()</code>、<code>calc_yield_from_gc()</code>、<code>log_experiment()</code>。再让 Agent 串起来："给定这个 Pd 负载量，预测 KA 油收率并生成实验记录"。<br><strong>这条故事线同时命中三个点：</strong>你懂实验、你会封装工具、你理解 Agent 的边界。</div>
+
+        <div class="k">门槛与风险</div>
+        <div class="v">依赖较重（ASE、MACE、LangGraph），官方建议用 <code>uv</code> 隔离环境；<code>e3nn</code> 容易和 UMA 冲突，建议 MACE 和 UMA 分环境装。首次跑 MACE 要下载权重，会"卡住"几分钟，不是死机。</div>
+      </div>
+
+      <div class="pcard top">
+        <div class="hd">
+          <span class="rank r1">2</span>
+          <span class="nm">MLIP Arena</span>
+          <span class="tg g">最低门槛 · 对应 B 类岗</span>
+          <span class="tg">Apache-2.0</span>
+          <span class="tg b">NeurIPS 2025 Spotlight</span>
+        </div>
+        <div class="meta">atomind-ai · 242 commits · 最近提交 2026-06-16 · <code>pip install mlip-arena</code></div>
+
+        <div class="k">它是什么</div>
+        <div class="v">一个"对模型架构和训练数据完全无关"的 MLIP 评测平台。它不比你精度高，它比你<b>评得公平</b>——专门解决现有基准的数据泄漏、迁移性受限、只会算误差不会算物理量这些毛病。任务覆盖结构优化、状态方程、分子动力学、声子、NEB、弹性张量。</div>
+
+        <div class="k">为什么适合你</div>
+        <div class="v">这是<strong>唯一一个"不需要训练模型"就能做出真项目</strong>的入口。你的工作是设计评测、发现模型的失效边界——这恰好是化学背景的人比 CS 人强的地方（你知道什么叫"物理上不合理"）。而且它的贡献路径写得很清楚：在 <code>mlip_arena/models/externals</code> 加个 ASE Calculator，或在 <code>/benchmarks</code> 加个新任务目录，提 PR。</div>
+
+        <div class="k">你能改成什么</div>
+        <div class="v">给它加一个<strong>氧化物表面 / 单原子位点</strong>的评测基准：用你的 Bi₂WO₆ 体系构造一组 EOS 与吸附能测试，跑 5–8 个主流势函数，报告"哪些模型在含 Bi 的重元素氧化物上失效"。这是一个 <b>negative result</b>，比刷高分可信，而且可以直接投给平台当贡献。</div>
+
+        <div class="k">门槛与风险</div>
+        <div class="v">最近提交是 4 个月前，活跃度中等（不像 ChemGraph 那样每天动），但作为评测平台不需要高频更新。全量基准要 SLURM 集群，<strong>但小体系在本地 CPU 能跑</strong>——你只需要跑你关心的那几个任务。</div>
+      </div>
+
+      <div class="pcard">
+        <div class="hd">
+          <span class="rank r1">3</span>
+          <span class="nm">MACE</span>
+          <span class="tg g">打地基 · 对应 A 类岗的入场券</span>
+          <span class="tg">MIT</span>
+          <span class="tg b">2026-10-15 更新</span>
+        </div>
+        <div class="meta">ACEsuit（剑桥）· 1,879 commits · Python ≥3.11 · PyTorch ≥2.5</div>
+
+        <div class="k">它是什么</div>
+        <div class="v">目前最主流的等变图神经网络势函数框架，附带 MACE-MP（材料）、MACE-OFF（有机分子）、MACE-Polar（静电）三个基础模型。一行 <code>pip install mace-torch</code> 就能加载预训练权重，CPU 上对小体系做结构弛豫是可行的。</div>
+
+        <div class="k">为什么适合你</div>
+        <div class="v">因为它<strong>是所有下游工作的地基</strong>。你不做 MACE 的项目，但你用 MACE 算出来的数就是项目一的原始数据。而且——面试官问"你懂不懂势函数"，你能不能答上来，差别很大。</div>
+
+        <div class="k">你能改成什么</div>
+        <div class="v">不建议改架构（那是 CS 博士的活）。建议做<strong>适用域研究</strong>：MACE-MP 在 Pd 单原子 / Bi₂WO₆ 这种"重元素 + 强关联 + 低维"体系上误差多大？和 DFT 差在哪？把误差画成图，这就是一份可交付的分析报告。</div>
+
+        <div class="k">⚠️ 版本陷阱</div>
+        <div class="v">v0.3.x 是当前受支持线，<strong>v1.0 正在 <code>mace-reforge</code> 分支重写且明确不保证兼容</strong>，检查点要通过转换器迁移。安装时<strong>必须锁版本</strong>，例如 <code>pip install "mace-torch==0.3.*"</code>；不要直接 <code>pip install mace-torch</code> 装 latest。</div>
+      </div>
+
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 4 -->
+  <section>
+    <h2><span class="num">04</span>20 周三阶路线：三个项目，一条故事线</h2>
+    <p class="lead">不要三个都做，也不要只做一个。按"工具 → 评测 → Agent"三层往上走，每一层都能独立写进简历，而且层层递进构成一个完整叙事。</p>
+
+    <table>
+      <thead>
+        <tr><th style="width:12%">阶段</th><th style="width:20%">用什么</th><th style="width:34%">做什么</th><th style="width:34%">交付物（简历上写这句）</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="strong">W1–W8<br><span style="font-size:11.5px;color:var(--ink-3)">工具层</span></td>
+          <td>ASE + MACE</td>
+          <td>把你体系的三个结构（Bi₂WO₆ 体相、表面、Pd 单原子位点）建出来，跑结构弛豫，算吸附能，和文献 DFT 值对比</td>
+          <td>"基于 MACE-MP 完成 Pd₁/Bi₂WO₆ 表面模型构建与吸附能计算，与 DFT 参考值偏差 &lt; x eV"</td>
+        </tr>
+        <tr>
+          <td class="strong">W9–W14<br><span style="font-size:11.5px;color:var(--ink-3)">评测层</span></td>
+          <td>MLIP Arena</td>
+          <td>把你 W1–W8 的体系做成一个评测任务，横评 5–8 个势函数，找出失效边界</td>
+          <td>"向 MLIP Arena 贡献氧化物表面评测基准，揭示主流势函数在含 Bi 重元素体系上的系统性偏差"</td>
+        </tr>
+        <tr>
+          <td class="strong">W15–W20<br><span style="font-size:11.5px;color:var(--ink-3)">Agent 层</span></td>
+          <td>ChemGraph</td>
+          <td>把你的光催化实验流程封装成一个 Skill，让 Agent 能调用、能串流程、能生成记录</td>
+          <td>"在 ChemGraph 中实现 photocatalysis 技能，将配气—取样—GC 分析—产率计算封装为可调用工具链"</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="okbox">
+      <div class="t">为什么这个顺序不能反</div>
+      没有 W1–W8 的结构建模能力，你在 MLIP Arena 里连一个测试体系都造不出来；没有 W9–W14 的评测经验，你在 ChemGraph 里不知道该让 Agent 调用什么、怎么判断结果对不对。<strong>三层是依赖关系，不是并列关系。</strong>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 5 -->
+  <section>
+    <h2><span class="num">05</span>"改成自己的项目"的三种合法形态</h2>
+    <p class="lead">这是全文最重要的一节。开源项目改一改就叫自己的，可行——但只有下面三种改法站得住。</p>
+
+    <table>
+      <thead><tr><th style="width:22%">形态</th><th style="width:40%">你做了什么</th><th style="width:38%">为什么面试官认</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="strong">① 换体系</td>
+          <td>把原作者用的 Cu / TiO₂ 体系换成你的 Bi₂WO₆ / Pd 单原子，重跑全流程</td>
+          <td>证明你有别人没有的问题。<strong>这是最自然的一种，也是你唯一有天然优势的一种。</strong></td>
+        </tr>
+        <tr>
+          <td class="strong">② 加评测</td>
+          <td>不改模型，改"怎么衡量模型好不好"——新指标、新测试集、失效分析</td>
+          <td>证明你有判断力。而且这类工作<strong>不需要 GPU、不需要训模型</strong>，最适合你的起点。</td>
+        </tr>
+        <tr>
+          <td class="strong">③ 加接口</td>
+          <td>把已有能力封装成 Agent 可调用的工具、MCP server、CLI</td>
+          <td>证明你能把科研能力工程化。<strong>这正是 2026 年最缺的人</strong>——会做实验又会让 AI 调用实验的人。</td>
+        </tr>
+        <tr>
+          <td class="strong" style="color:var(--warn)">✗ 改架构</td>
+          <td>改网络结构、加注意力模块、刷 SOTA</td>
+          <td><strong>不建议。</strong>这是 CS 博士的主场，你 20 周追不上，且做出来也无法验证"化学上为什么对"。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="verdict">
+      <strong>一句话记住：</strong>改"问题"和"评测"，不改"模型"。<br>
+      前者是你的护城河，后者是别人的主场。你的差异化不在网络结构里，在"我知道这个模型在什么化学体系上会骗人"。
+    </div>
+
+    <h3>三个必须避开的动作</h3>
+    <ul class="plain">
+      <li><strong>不要 fork 后改 README 就说是自己的。</strong>面试官打开 commit 历史，一眼就看出来你只改了三个文件。</li>
+      <li><strong>不要选一个已经停更的项目。</strong>你会在第 3 周卡在一个没人回答的报错上，然后整个计划崩掉。</li>
+      <li><strong>不要同时装三个势函数框架。</strong><code>e3nn</code>、<code>torch</code>、<code>ase</code> 的版本会互相打架，一个环境装一个，用 conda 隔离。</li>
+    </ul>
+  </section>
+
+  <hr>
+
+  <!-- 6 -->
+  <section>
+    <h2><span class="num">06</span>动手之前，先确认三件事</h2>
+    <p class="lead">这三个答案会改变具体选型，其他都是细节。</p>
+
+    <table>
+      <thead><tr><th style="width:8%">#</th><th style="width:44%">问题</th><th style="width:48%">不同答案对应的路线</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="strong">1</td>
+          <td>你手上有没有能用的 GPU？（实验室服务器 / 组里集群 / 只有笔记本）</td>
+          <td><strong>有 GPU：</strong>三条路线都能走，W1 可以直接上 MACE 的 medium 模型。<br><strong>只有笔记本：</strong>MACE 用小体系 + CPU 也能跑，但要把体系控制在 100 原子内；MLIP Arena 和 ChemGraph 完全不受影响。</td>
+        </tr>
+        <tr>
+          <td class="strong">2</td>
+          <td>会不会用 Linux 命令行 / 有没有服务器账号？</td>
+          <td><strong>会用：</strong>ChemGraph 和 MLIP Arena 都能装服务器上，跑得更顺。<br><strong>不会：</strong>先在 Windows 上跑通 MACE，Linux 留到 W5 之后再补——<strong>不要在第一天同时学两个新东西</strong>。</td>
+        </tr>
+        <tr>
+          <td class="strong">3</td>
+          <td>你的 Bi₂WO₆ 结构文件（cif / POSCAR）现在有吗？</td>
+          <td><strong>有：</strong>W1 当天就能开始建模。<br><strong>没有：</strong>从 Materials Project 下载标准结构（免费账号即可），或先用一个简单氧化物（TiO₂ 锐钛矿）练手，W3 再换回自己的体系。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="warnbox">
+      <div class="t">现在还不要做的事</div>
+      别急着 <code>pip install</code> 任何一个。你的 conda 环境还没建起来（Miniconda 都没装），<strong>先把 W0 的 <code>check_env.py</code> 跑出 5 个 [OK]</strong>，再谈装 MACE。否则你会在一个坏掉的地基上堆三个框架，最后分不清是哪个报的错。
+    </div>
+  </section>
+
+  <footer>
+    核查于 2026-10-19。数据来源：各项目 GitHub 仓库页面、PyPI、NeurIPS 2025 论文页、第三方榜单 best-of-atomistic-machine-learning（星数为该榜单近似值）。<br>
+    开源项目迭代快，<strong>动手前请再确认一次最新 commit 日期与安装命令</strong>；本项目报告不构成任何性能承诺。
+  </footer>
+
+</div>
+</body>
+</html>

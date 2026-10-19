@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI4Science 实习冲刺路线图 · 清华化学直博（三年级 · 零代码基础）</title>
+<style>
+  :root{
+    --ink:#16202e; --ink-2:#43536b; --ink-3:#7b8aa1;
+    --line:#e2e8f0; --line-2:#eef2f7;
+    --bg:#ffffff; --surface:#f7f9fc; --surface-2:#eef4fb;
+    --blue:#1d4e89; --blue-l:#2f6db5; --blue-bg:#eaf2fb;
+    --teal:#0f766e; --teal-bg:#e8f5f3;
+    --warn:#b42318; --warn-bg:#fdf1ef;
+    --amber:#8a5a00; --amber-bg:#fdf6e7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:#f0f3f8; color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px; line-height:1.75; -webkit-font-smoothing:antialiased;
+  }
+  .page{max-width:960px; margin:0 auto; background:var(--bg); box-shadow:0 1px 3px rgba(16,32,54,.06);}
+  .pad{padding:0 56px;}
+
+  /* ---------- cover ---------- */
+  .cover{background:linear-gradient(160deg,#123a66 0%,#1d4e89 55%,#2a6ba8 100%); color:#fff; padding:52px 56px 44px;}
+  .cover .kicker{font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:#b9d3ec; margin-bottom:14px;}
+  .cover h1{margin:0 0 12px; font-size:31px; line-height:1.35; font-weight:700; letter-spacing:-.01em;}
+  .cover .sub{font-size:15px; color:#d6e6f5; max-width:700px;}
+  .cover .meta{margin-top:26px; display:flex; flex-wrap:wrap; gap:10px;}
+  .chip{display:inline-block; padding:5px 12px; border-radius:100px; font-size:12.5px; background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.22); color:#eaf3fb;}
+  .chip.hot{background:#ffd9a8; border-color:#ffd9a8; color:#5a3a00; font-weight:600;}
+
+  /* ---------- sections ---------- */
+  section{padding:40px 56px 8px;}
+  section:last-of-type{padding-bottom:52px;}
+  h2{font-size:20px; margin:0 0 6px; letter-spacing:-.01em; display:flex; align-items:baseline; gap:10px;}
+  h2 .num{font-size:12px; font-weight:700; color:var(--blue-l); background:var(--blue-bg); padding:3px 8px; border-radius:5px; letter-spacing:.04em;}
+  h3{font-size:15.5px; margin:26px 0 8px; color:var(--ink);}
+  .lead{color:var(--ink-2); margin:0 0 20px; font-size:14.5px;}
+  p{margin:0 0 12px;}
+  hr{border:0; border-top:1px solid var(--line-2); margin:34px 0 0;}
+
+  /* ---------- verdict ---------- */
+  .verdict{background:var(--blue-bg); border-left:4px solid var(--blue); padding:18px 22px; border-radius:0 8px 8px 0; margin:18px 0 6px;}
+  .verdict strong{color:var(--blue);}
+  .warnbox{background:var(--warn-bg); border-left:4px solid var(--warn); padding:16px 20px; border-radius:0 8px 8px 0; margin:16px 0;}
+  .warnbox .t{font-weight:700; color:var(--warn); font-size:13.5px; margin-bottom:4px; letter-spacing:.02em;}
+  .okbox{background:var(--teal-bg); border-left:4px solid var(--teal); padding:16px 20px; border-radius:0 8px 8px 0; margin:16px 0;}
+  .okbox .t{font-weight:700; color:var(--teal); font-size:13.5px; margin-bottom:4px;}
+
+  /* ---------- timeline ---------- */
+  .tl{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:20px 0 8px;}
+  .tl-item{border:1px solid var(--line); border-radius:8px; padding:14px 14px 13px; background:var(--surface); position:relative;}
+  .tl-item.open{background:#fff; border-color:var(--blue-l); box-shadow:0 0 0 3px var(--blue-bg);}
+  .tl-item.closed{opacity:.62;}
+  .tl-date{font-size:11.5px; color:var(--ink-3); letter-spacing:.03em; margin-bottom:6px;}
+  .tl-title{font-weight:700; font-size:14px; margin-bottom:6px;}
+  .tl-desc{font-size:12.5px; color:var(--ink-2); line-height:1.6;}
+  .tag{display:inline-block; font-size:10.5px; padding:2px 7px; border-radius:4px; margin-top:9px; font-weight:600; letter-spacing:.02em;}
+  .tag.main{background:var(--blue); color:#fff;}
+  .tag.prep{background:var(--amber-bg); color:var(--amber); border:1px solid #f0dfb8;}
+  .tag.dead{background:#eef1f5; color:var(--ink-3);}
+  .tl-note{font-size:12.5px; color:var(--ink-3); margin-top:10px;}
+
+  /* ---------- tables ---------- */
+  table{width:100%; border-collapse:collapse; margin:14px 0 8px; font-size:13.5px;}
+  th{text-align:left; font-weight:600; font-size:12px; letter-spacing:.05em; color:var(--ink-3); text-transform:uppercase; padding:9px 12px; border-bottom:1.5px solid var(--line); background:var(--surface);}
+  td{padding:11px 12px; border-bottom:1px solid var(--line-2); vertical-align:top; line-height:1.65;}
+  tr:last-child td{border-bottom:0;}
+  td.strong{font-weight:600;}
+  .phase-row td{background:var(--surface-2); font-weight:700; font-size:12.5px; color:var(--blue); letter-spacing:.03em; padding:8px 12px;}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; background:var(--surface); padding:1px 5px; border-radius:4px; border:1px solid var(--line);}
+
+  /* ---------- checklist ---------- */
+  .check{list-style:none; padding:0; margin:12px 0;}
+  .check li{position:relative; padding-left:26px; margin-bottom:9px; font-size:14px; line-height:1.65;}
+  .check li::before{content:""; position:absolute; left:0; top:7px; width:13px; height:13px; border:1.5px solid var(--ink-3); border-radius:3px;}
+  .nocheck{list-style:none; padding:0; margin:12px 0;}
+  .nocheck li{position:relative; padding-left:26px; margin-bottom:8px; font-size:14px; color:var(--ink-2);}
+  .nocheck li::before{content:"×"; position:absolute; left:6px; top:0; color:var(--warn); font-weight:700;}
+
+  /* ---------- resume preview ---------- */
+  .resume{border:1px solid var(--line); border-radius:8px; background:#fff; padding:22px 24px; margin:14px 0; font-size:13px; line-height:1.7;}
+  .resume .r-name{font-size:17px; font-weight:700; letter-spacing:.02em;}
+  .resume .r-tag{color:var(--blue); font-size:12.5px; margin-top:2px; font-weight:600;}
+  .resume .r-sec{margin-top:16px; padding-top:10px; border-top:1px solid var(--line-2); font-weight:700; font-size:11.5px; letter-spacing:.1em; color:var(--ink-3); text-transform:uppercase;}
+  .resume .ph{background:var(--amber-bg); color:var(--amber); padding:0 4px; border-radius:3px; border:1px dashed #e6cf9a;}
+  .resume .r-line{margin-top:6px;}
+  .resume .r-title{font-weight:600;}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:14px;}
+  .card{border:1px solid var(--line); border-radius:8px; padding:18px 20px; background:var(--surface);}
+  .card .ct{font-weight:700; font-size:14px; margin-bottom:6px; color:var(--blue);}
+  .card .cd{font-size:13.5px; color:var(--ink-2); line-height:1.7;}
+
+  footer{padding:26px 56px 44px; color:var(--ink-3); font-size:12px; border-top:1px solid var(--line-2);}
+
+  @media (max-width:800px){
+    .pad,section,.cover,footer{padding-left:22px; padding-right:22px;}
+    .tl{grid-template-columns:1fr 1fr;}
+    .grid2{grid-template-columns:1fr;}
+    .cover h1{font-size:24px;}
+  }
+  @media print{
+    body{background:#fff;}
+    .page{box-shadow:none; max-width:none;}
+    section{page-break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="cover">
+    <div class="kicker">Career Roadmap · AI for Science</div>
+    <h1>AI4Science 实习冲刺路线图</h1>
+    <div class="sub">清华大学化学系直博三年级 · 编程零基础 · 导师放羊 · 目标：清华周边 AI4Science / 大模型相关实习</div>
+    <div class="meta">
+      <span class="chip">起始日 2026-10-19</span>
+      <span class="chip">20 周主线</span>
+      <span class="chip hot">真正可用窗口：2 个</span>
+      <span class="chip">每周投入约 20 小时</span>
+    </div>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <h2><span class="num">01</span>先算窗口：你只剩 2 个，不是 4 个</h2>
+    <p class="lead">直博三年级 = 已入学约 25 个月。按 5 年制推算 2029 年年中毕业，剩下约 32 个月；但博四下学期开始写毕业论文，实际可外出时间被压到 20 个月以内。</p>
+
+    <div class="tl">
+      <div class="tl-item closed">
+        <div class="tl-date">2026.10 — 2027.02</div>
+        <div class="tl-title">准备期</div>
+        <div class="tl-desc">零基础，无法实习。唯一任务是补代码 + 做出第一个项目。</div>
+        <div class="tag prep">不可投递</div>
+      </div>
+      <div class="tl-item open">
+        <div class="tl-date">2027.03 — 2027.08</div>
+        <div class="tl-title">窗口一 · 主力</div>
+        <div class="tl-desc">春招 + 暑期实习。此时你应有：1 个自建项目 + 1 个复现项目。目标：数据/评测岗、干湿闭环岗。</div>
+        <div class="tag main">主投</div>
+      </div>
+      <div class="tl-item open">
+        <div class="tl-date">2027.09 — 2028.06</div>
+        <div class="tl-title">窗口二 · 转正</div>
+        <div class="tl-desc">博四。用于第二段实习或争取转正/推荐信。同时毕业论文要开题，时间被挤压。</div>
+        <div class="tag main">主投</div>
+      </div>
+      <div class="tl-item closed">
+        <div class="tl-date">2028.07 之后</div>
+        <div class="tl-title">收尾期</div>
+        <div class="tl-desc">毕业论文 + 求职。实习基本关闭，只剩正式岗谈判。</div>
+        <div class="tag dead">已关闭</div>
+      </div>
+    </div>
+
+    <div class="warnbox">
+      <div class="t">这条时间线意味着什么</div>
+      你要在 <strong>2027 年 3 月前</strong>，从"不会写代码"变成"能交付一个带指标的项目"。也就是 <strong>约 20 周、约 400 小时</strong>。这不是"学完机器学习"，这是"造出一个能证明你的东西"。两者的差别决定了成败。
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 2 -->
+  <section>
+    <h2><span class="num">02</span>定位修正：零基础把 A 类岗关掉了</h2>
+    <p class="lead">上一轮说的三个入口，现在必须做减法。原因是数学的，不是态度的。</p>
+
+    <table>
+      <thead>
+        <tr><th style="width:20%">入口</th><th style="width:26%">典型岗位</th><th style="width:26%">对你的门槛</th><th style="width:28%">结论</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="strong">A 类 · 模型算法岗</td>
+          <td>字节 Seed 物质发现算法、MSRA AI4S 研究实习、AISI 蛋白结构生成</td>
+          <td>要求：PyTorch 熟练 + 顶会/竞赛 + 独立复现论文。<strong>竞争者是 CS 博士</strong>。</td>
+          <td><strong style="color:var(--warn)">2027 年前不要投。</strong>可以留作 2028 年的目标，但不能当第一站。</td>
+        </tr>
+        <tr>
+          <td class="strong">B 类 · 数据与评测岗</td>
+          <td>科学文档/谱图解析、数据集构建、benchmark 评测、科学多模态数据</td>
+          <td>要 pandas + 清洗 + 一点模型。化学背景是硬通货，因为要判断"这条数据对不对"。</td>
+          <td><strong style="color:var(--teal)">首选。</strong>零基础 20 周可达，且你的化学判断力在这类岗位比代码更值钱。</td>
+        </tr>
+        <tr>
+          <td class="strong">C 类 · 干湿闭环 / 仪器 Agent</td>
+          <td>AISI 科研仪器智能体、深势 Uni-Lab、晶泰自动化实验室、字节自动化系统</td>
+          <td>要"真做过实验 + 会写脚本调仪器 + 理解 Agent 工具调用"。<strong>CS 人补不了实验直觉。</strong></td>
+          <td><strong style="color:var(--teal)">并列首选，且是长期最优。</strong>你在这里的稀缺性最高。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="verdict">
+      <strong>一句话定位：</strong>你不是"要转行做算法的人"，你是"能把化学实验变成可编程、可回流数据的人"。这句话直接对应 C 类岗的 JD 原文——AISI 那个岗位写的就是"把实验流程与操作知识转化为智能体可用的结构化能力"。<br><br>
+      <strong>这条路为什么对零基础友好：</strong>C 类岗的代码量远小于算法岗，但要求你懂仪器、懂实验误差、懂什么叫"这个数据不可信"。这三样你已经有，CS 人没有。
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 3 -->
+  <section>
+    <h2><span class="num">03</span>20 周执行表：每周必须留下一个能跑的仓库</h2>
+    <p class="lead">核心纪律：<strong>不许"先学完再看"。</strong>每周结束时 GitHub 上必须多一个 commit。看不完教程不要紧，跑不出东西才是失败。</p>
+
+    <table>
+      <thead>
+        <tr><th style="width:14%">周次</th><th style="width:34%">学什么（只学这些）</th><th style="width:26%">产出（上传 GitHub）</th><th style="width:26%">验收（做不到不许进下一阶段）</th></tr>
+      </thead>
+      <tbody>
+        <tr class="phase-row"><td colspan="4">阶段 0 · 基建（第 0 周，10/19 – 10/25）</td></tr>
+        <tr>
+          <td class="strong">W0</td>
+          <td>装 Miniconda + VS Code；学会 <span class="mono">conda create</span>；注册 GitHub；<strong>只学 3 个 Git 命令</strong>：add / commit / push</td>
+          <td>一个空仓库，里面一个 <span class="mono">hello.py</span>，能跑出你的名字</td>
+          <td>能在新电脑上从零跑通"建环境 → 跑脚本 → 推 GitHub"</td>
+        </tr>
+
+        <tr class="phase-row"><td colspan="4">阶段 1 · Python 与数据（W1–W4，10/26 – 11/22）· 目标：把你自己的实验数据变成数据集</td></tr>
+        <tr>
+          <td class="strong">W1</td>
+          <td>变量、list / dict、if / for、函数、读写文件。<strong>跳过类、装饰器、多线程。</strong></td>
+          <td>把课题组一个 Excel 用 <span class="mono">open()</span> 读出来并打印</td>
+          <td>能手写一个函数：输入文件路径，输出行数</td>
+        </tr>
+        <tr>
+          <td class="strong">W2</td>
+          <td>pandas：<span class="mono">read_excel</span> / 筛选 / 分组 / 缺失值 / <span class="mono">to_csv</span>；numpy 数组运算</td>
+          <td>课题原始数据 → 清洗后的 <span class="mono">dataset.csv</span></td>
+          <td>能说清你的表里哪几行被删了、为什么删</td>
+        </tr>
+        <tr>
+          <td class="strong">W3</td>
+          <td>matplotlib：散点、柱状、误差棒；<strong>学会画 parity plot（预测 vs 真实）</strong></td>
+          <td>3 张描述你课题数据的图</td>
+          <td>图有轴标签、单位、图例，能直接放进论文</td>
+        </tr>
+        <tr>
+          <td class="strong">W4</td>
+          <td>合并、特征工程入门：把"催化剂名"变成数值（one-hot / 描述符）</td>
+          <td><span class="mono">features.csv</span>：n 行 × 若干描述符列 + 1 列标签</td>
+          <td><strong>关键验收：</strong>能回答"我的标签是什么、单位是什么、有多少条、有没有重复样本"</td>
+        </tr>
+
+        <tr class="phase-row"><td colspan="4">阶段 2 · 机器学习基线（W5–W6，11/23 – 12/06）· 目标：跑出第一个 R²</td></tr>
+        <tr>
+          <td class="strong">W5</td>
+          <td>sklearn：<span class="mono">train_test_split</span>、线性回归、随机森林、XGBoost；MAE / R²</td>
+          <td>第一个预测模型，输出 MAE 与 R²</td>
+          <td>能解释 R²=0.8 和 R²=0.3 分别意味着什么</td>
+        </tr>
+        <tr>
+          <td class="strong">W6</td>
+          <td><strong>5 折交叉验证</strong>；数据泄漏；特征重要性 / SHAP</td>
+          <td>带 CV 的报告 + 特征重要性排序图</td>
+          <td><strong>必须能回答：</strong>"为什么不能随机划分？我的数据有没有同源泄漏？"（面试必问）</td>
+        </tr>
+
+        <tr class="phase-row"><td colspan="4">阶段 3 · PyTorch 闭环（W7–W8，12/07 – 12/20）· 目标：白手写出训练循环</td></tr>
+        <tr>
+          <td class="strong">W7</td>
+          <td>Tensor、自动求导、<span class="mono">nn.Module</span>、loss、optimizer、训练/验证循环</td>
+          <td>MNIST 跑通（1 天即可，别恋战）；换成自己的表格数据</td>
+          <td>不看教程，能从空文件写出一个训练循环</td>
+        </tr>
+        <tr>
+          <td class="strong">W8</td>
+          <td>Dataset / DataLoader、过拟合与早停、保存与加载权重、Colab 免费用 GPU</td>
+          <td>项目一的神经网络版本，与传统模型对比</td>
+          <td>能说清 <span class="mono">loss.backward()</span> 到底做了什么、为什么要 <span class="mono">zero_grad()</span></td>
+        </tr>
+
+        <tr class="phase-row"><td colspan="4">阶段 4 · 图神经网络与复现（W9–W12，12/21 – 01/17）· 目标：做出能让面试官点头的项目</td></tr>
+        <tr>
+          <td class="strong">W9</td>
+          <td>分子为什么是图；节点/边特征；GCN、GIN 的直觉（不推公式）</td>
+          <td>PyG 跑通 <span class="mono">Introduction by Example</span></td>
+          <td>能说清"原子是节点还是边、键的特征放哪"</td>
+        </tr>
+        <tr>
+          <td class="strong">W10</td>
+          <td>在公开数据集（ESOL / Tox21 / Lipophilicity）上跑 GIN；读 Uni-Mol 论文的<strong>方法和实验部分</strong></td>
+          <td>一条能复现的 baseline，指标写进 README</td>
+          <td>能对比"传统描述符 vs 图神经网络"在你数据上的差异</td>
+        </tr>
+        <tr>
+          <td class="strong">W11</td>
+          <td>复现一个开源模型（Chemprop 或 Uni-Mol 推理）；工程化：<span class="mono">requirements.txt</span>、README、配置文件</td>
+          <td>完整仓库：别人 clone 下来能跑通</td>
+          <td>让一个同学按你的 README 独立跑通（这是唯一有效的验收）</td>
+        </tr>
+        <tr>
+          <td class="strong">W12</td>
+          <td>写技术报告：问题、数据、方法、结果、失败分析。<strong>失败分析比结果更值钱</strong></td>
+          <td>3000 字报告 + 仓库 + 一张 parity plot</td>
+          <td>报告里有一个"我试了但没成功"的段落</td>
+        </tr>
+
+        <tr class="phase-row"><td colspan="4">阶段 5 · 包装与投递（W13–W16，01/18 – 02/14）</td></tr>
+        <tr>
+          <td class="strong">W13</td>
+          <td>简历按"问题—方法—指标"重写；GitHub Profile README；技术博客第一篇</td>
+          <td>一页简历终稿</td>
+          <td>简历上每个项目后面都有一个数字</td>
+        </tr>
+        <tr>
+          <td class="strong">W14</td>
+          <td>补"大模型"三个字：Transformer 直觉、LoRA 微调、RAG 流程、Agent 工具调用</td>
+          <td>一个能跑的 RAG demo（读你的领域文献）</td>
+          <td>能说清"检索召回率怎么评、失败case长什么样"</td>
+        </tr>
+        <tr>
+          <td class="strong">W15–W16</td>
+          <td>投递 + 面试复盘。每场面试后当天写 300 字复盘</td>
+          <td>投递记录表（机构 / 岗位 / 状态 / 复盘）</td>
+          <td>至少投出 15 家，拿到 2 场面试</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="okbox">
+      <div class="t">时间预算怎么挤（放羊导师的用法）</div>
+      工作日每天 <strong>2 小时</strong>（晚上 21:00–23:00，实验跑着的时候正好）+ 周末每天 <strong>5 小时</strong> = <strong>每周 20 小时</strong>。20 周 ≈ 400 小时。<br>
+      <strong>不要</strong>停实验去学代码——你还要毕业，而且实验数据正是项目一的原料。
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 4 -->
+  <section>
+    <h2><span class="num">04</span>两个项目，不要多</h2>
+    <p class="lead">零基础的人最常见的死法是"项目太多、每个都浅"。你只需要两个，但要做到别人能复现。</p>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="ct">项目一 · 你的课题数据集（W2–W8）</div>
+        <div class="cd">
+          把博士课题的实验记录整理成表格数据集，训练传统模型 + 神经网络预测性能指标，做交叉验证与特征重要性分析。<br><br>
+          <strong>它证明的是：</strong>你有别人没有的数据和问题品味。<br>
+          <strong>它不证明：</strong>你会训练大模型。<br><br>
+          <strong>关键：</strong>数据量小不是问题，<strong>编数据才是</strong>。样本只有 80 条就老实写 80 条，并把"小样本下怎么做可靠评估"讲清楚——这反而是面试加分项。
+        </div>
+      </div>
+      <div class="card">
+        <div class="ct">项目二 · 复现一个开源模型（W9–W12）</div>
+        <div class="cd">
+          在公开数据集上复现 Chemprop 或 Uni-Mol 的推理，指标对齐原文，写清差异原因。<br><br>
+          <strong>它证明的是：</strong>你的代码能跑、能读论文、能定位问题——这是所有面试官对非科班的第一疑虑。<br><br>
+          <strong>关键：</strong>不要挑最难的。挑一个"一周能跑通、两周能对齐"的。复现失败也可以在报告里写清楚，但要写出你排查了哪几步。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 5 -->
+  <section>
+    <h2><span class="num">05</span>简历骨架（直接往里填）</h2>
+    <p class="lead">黄色是待填项。一页，不要两页。零基础阶段，简历的杀伤力全部集中在"这一个项目有没有数字"。</p>
+
+    <div class="resume">
+      <div class="r-name"><span class="ph">姓名</span></div>
+      <div class="r-tag">清华大学 化学系 · 博士研究生（直博，<span class="ph">2024</span> 级）｜ AI for Science · 科学数据与机器学习势函数</div>
+      <div style="color:var(--ink-3); font-size:12px; margin-top:4px;">邮箱 ｜ GitHub: github.com/<span class="ph">xxx</span> ｜ 博客/知乎</div>
+
+      <div class="r-sec">教育背景</div>
+      <div class="r-line">清华大学 · 化学 · 博士（直博） · <span class="ph">2024.09 – 2029.06（预计）</span></div>
+      <div class="r-line"><span class="ph">北京 XX 大学</span> · <span class="ph">专业</span> · 学士 · <span class="ph">20XX – 20XX</span></div>
+
+      <div class="r-sec">研究项目</div>
+      <div class="r-line"><span class="r-title">Pd 单原子 / 纳米团簇 @ Bi₂WO₆ 光催化环己烷氧化 —— 数据驱动的性能预测</span></div>
+      <div class="r-line">· <strong>问题：</strong>该体系性能受多因素耦合影响，试错成本高，缺少可预测的构效关系。</div>
+      <div class="r-line">· <strong>数据：</strong>整理 <span class="ph">n</span> 组实验记录，构建含 <span class="ph">k</span> 个描述符（负载量、配位数、Bader 电荷、带隙…）的数据集，制定清洗与去重规则。</div>
+      <div class="r-line">· <strong>方法：</strong>以 XGBoost 与 GIN 双基线建模，5 折交叉验证，SHAP 归因分析。</div>
+      <div class="r-line">· <strong>结果：</strong>MAE = <span class="ph">x.x%</span>，R² = <span class="ph">0.xx</span>；识别 Pd 配位数为首要因子，指导 <span class="ph">m</span> 组新样品验证，命中 <span class="ph">p</span> 组。</div>
+      <div class="r-line">· <strong>产出：</strong>开源仓库（含数据、代码、复现说明），技术报告 <span class="ph">链接</span>。</div>
+
+      <div class="r-sec">复现与开源</div>
+      <div class="r-line"><span class="r-title">复现 <span class="ph">Chemprop / Uni-Mol</span> 在 <span class="ph">ESOL</span> 数据集上的性能</span></div>
+      <div class="r-line">· 复现原文指标，RMSE 差异 <span class="ph">&lt;5%</span>；定位差异来源于 <span class="ph">数据划分方式 / 特征归一化</span>。</div>
+
+      <div class="r-sec">技术栈</div>
+      <div class="r-line">语言：Python ｜ 数据：pandas / numpy / matplotlib ｜ 模型：scikit-learn / XGBoost / PyTorch / PyG</div>
+      <div class="r-line">科学计算：<span class="ph">VASP / CP2K</span> ｜ 工具：Git / Linux / Conda / Colab</div>
+    </div>
+
+    <div class="nocheck">
+      <li>不写"精通 Python"——你现在不精通，面试官一问就露。</li>
+      <li>不写课程列表、不写 GPA（除非年级前 5%）、不写"熟悉 Office"。</li>
+      <li>不写"参与了 XX 国家级项目"这种没有你个人贡献的描述。</li>
+      <li>不放照片、不用彩色模板、不超过一页。</li>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 6 -->
+  <section>
+    <h2><span class="num">06</span>投递清单（按"零基础友好度"排序）</h2>
+    <p class="lead">下面这些是 2026 年 Q3–Q4 仍在公开招人的方向，投递前务必回官网核实岗位是否还开着——实习 JD 的有效期通常只有 1–3 个月。</p>
+
+    <table>
+      <thead>
+        <tr><th style="width:24%">机构</th><th style="width:20%">位置</th><th style="width:32%">对口岗位方向</th><th style="width:24%">对你的友好度</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="strong">北京科学智能研究院 AISI</td>
+          <td>海淀·智源大厦</td>
+          <td>科研仪器智能体研发实习（SEM/TEM → Agent）、材料设计与优化实习、机器学习势函数工程研发实习</td>
+          <td><strong style="color:var(--teal)">最高</strong>。仪器岗直接吃你的湿实验经验，代码要求最低</td>
+        </tr>
+        <tr>
+          <td class="strong">深势科技 DP</td>
+          <td>海淀·中关村</td>
+          <td>「追光计划」实习：科学多模态数据（Uni-Parser / OmniScience）、Uni-Lab 智能实验室；<strong>支持线上</strong></td>
+          <td><strong style="color:var(--teal)">高</strong>。数据方向门槛适中，线上可降低导师沟通成本</td>
+        </tr>
+        <tr>
+          <td class="strong">量坤科技</td>
+          <td>北京（创始团队清华北大）</td>
+          <td>AI4S 算法实习：DFT / MD / 反应机理 / 聚合物建模；<strong>可远程</strong></td>
+          <td><strong style="color:var(--teal)">高</strong>。JD 直接写要计算化学背景</td>
+        </tr>
+        <tr>
+          <td class="strong">清华 AIR 智能产业研究院</td>
+          <td>清华科技园（东门外）</td>
+          <td>李航团队科研实习；AIR 的 AI4Science 方向；提供 A100/A800 集群</td>
+          <td><strong style="color:var(--blue)">中高</strong>。地理零成本，但更偏模型岗</td>
+        </tr>
+        <tr>
+          <td class="strong">百奥几何 BioGeometry</td>
+          <td>海淀·中关村 1505</td>
+          <td>机器学习实习（AI4Science）；JD 明写"不要求传统大模型经验"</td>
+          <td><strong style="color:var(--blue)">中</strong>。偏蛋白方向，需要补生物</td>
+        </tr>
+        <tr>
+          <td class="strong">MSRA 微软亚洲研究院</td>
+          <td>中关村·丹棱街 5 号</td>
+          <td>AI for Science 研究实习、科学计算研究实习（招 3–5 人）</td>
+          <td><strong style="color:var(--amber)">低（当前）</strong>。要导师许可 + 硬指标，留到 2027 下半年</td>
+        </tr>
+        <tr>
+          <td class="strong">字节 Seed</td>
+          <td>中关村 / 知春路</td>
+          <td>物质发现算法、化学反应多尺度算法、自动化系统</td>
+          <td><strong style="color:var(--amber)">低（当前）</strong>。竞争者以顶会博士为主</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="warnbox">
+      <div class="t">投递渠道的现实提醒</div>
+      官网投递的转化率最低，<strong>内推和"直接找到组里的人"才是主路径</strong>。放羊导师不给你人脉，那就自己造：课题组师兄的去向、GitHub 上给目标团队的项目提 PR、AISI/深势的技术分享会、公众号的招聘汇总——这四条比海投有效十倍。
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 7 -->
+  <section>
+    <h2><span class="num">07</span>零基础特有的四个坑</h2>
+
+    <h3>坑一：看视频代替写代码</h3>
+    <p>零基础的人 80% 的时间花在"看懂了"，但面试考的是"写得出"。<strong>硬规则：任何教程，看 30 分钟必须停下来自己敲一遍。</strong>一周结束时没有 commit，就算这周失败，下周补上。</p>
+
+    <h3>坑二：放羊导师 = 没人给你纠错</h3>
+    <p>这是"放羊"最被低估的代价。实验做错了，仪器会告诉你；代码写错了，只有人才能告诉你。<strong>必须主动找一个人：</strong>组里会用 Python 的师兄、隔壁计算组的同学、或一个固定的线上学习搭子。每周把你的代码给别人看一次，哪怕只是让他跑一遍你的 README。</p>
+
+    <h3>坑三：以为要"先学完数学"</h3>
+    <p>你不需要先补线性代数和概率论。<strong>顺序反了。</strong>先用起来，遇到不懂的公式再回去查——这样学的数学是"有用的数学"，而不是"考试用的数学"。真正需要提前补的只有一个：<strong>能看懂矩阵乘法在做什么</strong>。</p>
+
+    <h3>坑四：把实习当成逃离博士的出口</h3>
+    <p>直博三年级最危险的心态是"实验做不下去，所以去搞 AI"。面试官能闻出来。<strong>正确的叙事是：</strong>"我的课题卡在试错成本太高，我想用机器学习把搜索空间压下来。"这个叙事既真实，又正好是 AI4Science 的存在理由。它同时解决了导师同意、面试说服、论文选题三个问题。</p>
+  </section>
+
+  <hr>
+
+  <!-- 8 -->
+  <section>
+    <h2><span class="num">08</span>Plan B：如果 20 周后走不通</h2>
+    <p class="lead">诚实地说：零基础 20 周拿到 AI4Science 实习，<strong>概率不高，但不是零</strong>。所以需要一个不丢人的退路。</p>
+
+    <div class="card" style="background:var(--surface-2); border-color:#cfdff0;">
+      <div class="ct">退路不是失败，是换一个更宽的入口</div>
+      <div class="cd">
+        如果 2027 年 3 月投递没有回音，<strong>不要加码投算法岗</strong>，改为：<br><br>
+        ① <strong>把项目一做成一篇文章</strong>（哪怕中文核心或会议），"机器学习辅助 XX 催化体系筛选"——这篇论文本身就是 AI4S 的入场券；<br>
+        ② <strong>转向博士后的 AI4S 岗</strong>：AISI、上海 AI Lab、中科大科学智能中心这类机构的博士后普遍 16–25K，<strong>明确要博士、不要 CS 学历</strong>，且更看重领域理解；<br>
+        ③ <strong>走"计算+实验"复合型路线</strong>：高校教职和研究所现在最缺的正是"既会做实验又会跑模型"的人，这比纯算法岗竞争小得多，而且你的博士没白读。<br><br>
+        三条退路都比"硬转纯算法岗"的现实。
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    编制于 2026-10-19 ｜ 岗位信息来源于 2026 年 9–10 月公开渠道（AISI / MSRA / 深势 / 量坤 / 百奥几何等），<strong>投递前请以官网最新 JD 为准</strong>。<br>
+    本方案的所有建议均基于"化学直博 + 零编程基础 + 导师放羊"这三个前提；任一前提变化，路径需重算。
+  </footer>
+
+</div>
+</body>
+</html>

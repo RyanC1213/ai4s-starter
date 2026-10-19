@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 0 操作卡 · 从报错到跑通</title>
+<style>
+  :root{
+    --ink:#16202e; --ink-2:#43536b; --ink-3:#7b8aa1;
+    --line:#e2e8f0; --line-2:#eef2f7;
+    --bg:#ffffff; --surface:#f7f9fc; --blue:#1d4e89; --blue-l:#2f6db5; --blue-bg:#eaf2fb;
+    --teal:#0f766e; --teal-bg:#e8f5f3; --warn:#b42318; --warn-bg:#fdf1ef;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:#f0f3f8; color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px; line-height:1.75; -webkit-font-smoothing:antialiased;}
+  .page{max-width:940px; margin:0 auto; background:var(--bg); box-shadow:0 1px 3px rgba(16,32,54,.06);}
+
+  .cover{background:linear-gradient(160deg,#123a66 0%,#1d4e89 55%,#2a6ba8 100%); color:#fff; padding:44px 52px 36px;}
+  .cover .kicker{font-size:11.5px; letter-spacing:.18em; text-transform:uppercase; color:#b9d3ec; margin-bottom:12px;}
+  .cover h1{margin:0 0 10px; font-size:27px; line-height:1.35; font-weight:700;}
+  .cover .sub{font-size:14.5px; color:#d6e6f5; max-width:700px;}
+  .cover .meta{margin-top:20px; display:flex; flex-wrap:wrap; gap:9px;}
+  .chip{display:inline-block; padding:5px 11px; border-radius:100px; font-size:12px; background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.22); color:#eaf3fb;}
+  .chip.hot{background:#ffd9a8; border-color:#ffd9a8; color:#5a3a00; font-weight:600;}
+
+  section{padding:34px 52px 6px;}
+  section:last-of-type{padding-bottom:46px;}
+  h2{font-size:19.5px; margin:0 0 6px; display:flex; align-items:baseline; gap:10px;}
+  h2 .num{font-size:12px; font-weight:700; color:var(--blue-l); background:var(--blue-bg); padding:3px 8px; border-radius:5px;}
+  h3{font-size:15px; margin:22px 0 6px;}
+  .lead{color:var(--ink-2); margin:0 0 16px; font-size:14.5px;}
+  hr{border:0; border-top:1px solid var(--line-2); margin:30px 0 0;}
+
+  .warnbox{background:var(--warn-bg); border-left:4px solid var(--warn); padding:15px 19px; border-radius:0 8px 8px 0; margin:14px 0;}
+  .warnbox .t{font-weight:700; color:var(--warn); font-size:13.5px; margin-bottom:4px;}
+  .okbox{background:var(--teal-bg); border-left:4px solid var(--teal); padding:15px 19px; border-radius:0 8px 8px 0; margin:14px 0;}
+  .okbox .t{font-weight:700; color:var(--teal); font-size:13.5px; margin-bottom:4px;}
+  .infobox{background:var(--blue-bg); border-left:4px solid var(--blue); padding:15px 19px; border-radius:0 8px 8px 0; margin:14px 0;}
+
+  table{width:100%; border-collapse:collapse; margin:12px 0 6px; font-size:13.5px;}
+  th{text-align:left; font-weight:600; font-size:11.5px; letter-spacing:.05em; color:var(--ink-3); text-transform:uppercase; padding:9px 11px; border-bottom:1.5px solid var(--line); background:var(--surface);}
+  td{padding:10px 11px; border-bottom:1px solid var(--line-2); vertical-align:top; line-height:1.62;}
+  tr:last-child td{border-bottom:0;}
+
+  pre{background:#1b2534; color:#dfe7f2; padding:13px 16px; border-radius:7px; overflow-x:auto; font-size:12.5px; line-height:1.7; margin:9px 0 11px;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;}
+  pre .c{color:#7f93ad;}
+  pre .hl{color:#8fd0ff;}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; background:var(--surface); padding:1px 5px; border-radius:4px; border:1px solid var(--line);}
+
+  .step{display:flex; gap:14px; margin:18px 0 4px; align-items:flex-start;}
+  .step .n{flex:0 0 26px; height:26px; border-radius:50%; background:var(--blue); color:#fff; font-size:12.5px; font-weight:700; display:flex; align-items:center; justify-content:center; margin-top:3px;}
+  .step .body{flex:1;}
+  .step .st{font-weight:700; font-size:14.5px;}
+  .step .sd{color:var(--ink-2); font-size:13.5px; margin-top:2px;}
+
+  .nocheck{list-style:none; padding:0; margin:10px 0;}
+  .nocheck li{position:relative; padding-left:24px; margin-bottom:7px; font-size:14px; color:var(--ink-2);}
+  .nocheck li::before{content:"×"; position:absolute; left:5px; top:0; color:var(--warn); font-weight:700;}
+
+  footer{padding:22px 52px 40px; color:var(--ink-3); font-size:12px; border-top:1px solid var(--line-2);}
+  @media (max-width:800px){ section,.cover,footer{padding-left:20px; padding-right:20px;} }
+  @media print{ body{background:#fff;} .page{box-shadow:none; max-width:none;} section{page-break-inside:avoid;} }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="cover">
+    <div class="kicker">W0 · Day 0 Setup</div>
+    <h1>从报错到跑通：9 步操作卡</h1>
+    <div class="sub">针对你这台机器的实际状态写的。截图里的 <code style="background:rgba(255,255,255,.15);border:0;color:#fff">SyntaxError</code> 不是环境坏了，是命令放错了地方。</div>
+    <div class="meta">
+      <span class="chip hot">本机未安装 Miniconda</span>
+      <span class="chip">需要先装</span>
+      <span class="chip">全程约 20 分钟</span>
+    </div>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <h2><span class="num">01</span>你截图里发生了什么</h2>
+
+    <p class="lead">你在 <code>Desktop\test\#test.py</code> 里写了六行<strong>终端命令</strong>，然后用 <code>D:\python.exe</code> 去执行这个文件。Python 读到第 2 行 <code>conda create -n ai4s python=3.11 -y</code>，它不认识 <code>conda</code> 这个词，也不知道命令还能这么写，于是报 <code>SyntaxError: Invalid syntax</code>。</p>
+
+    <table>
+      <thead><tr><th style="width:32%">表面现象</th><th style="width:68%">真实原因</th></tr></thead>
+      <tbody>
+        <tr><td><code>SyntaxError</code> 指向第 2 行</td><td>那一行是 shell 命令，不是 Python 语法。Python 的语法里没有"动词 + 参数"这种写法。</td></tr>
+        <tr><td>终端显示 <code>&amp; D:\python.exe</code></td><td>VS Code 用你点"运行"时选中的解释器直接执行了文件，跳过了 conda。</td></tr>
+        <tr><td>状态栏写着 <code>Python 3.14</code></td><td>这是系统里的另一个 Python，不是我们要的 3.11 环境。</td></tr>
+      </tbody>
+    </table>
+
+    <div class="warnbox">
+      <div class="t">两个附带问题，即使命令敲对了也会挂</div>
+      ① 文件在 <code>Desktop\test\</code>，但 <code>requirements.txt</code> 和 <code>src/</code> 在 <code>D:\WorkBuddy-output\2026-10-19-18-37-44\w0-starter\</code>——不在同一个目录，<code>pip install -r requirements.txt</code> 会报找不到文件。<br>
+      ② 文件名以 <code>#</code> 开头。在 Python 里 <code>#</code> 是注释符，虽然文件名允许，但它在终端里也容易被当成注释截断，是个纯粹给自己添堵的命名。<strong>这个文件直接删掉。</strong>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 2 -->
+  <section>
+    <h2><span class="num">02</span>我查了你这台机器</h2>
+    <table>
+      <thead><tr><th style="width:34%">检查项</th><th style="width:22%">结果</th><th style="width:44%">意味着</th></tr></thead>
+      <tbody>
+        <tr><td>Miniconda / Anaconda</td><td><strong style="color:var(--warn)">未安装</strong></td><td>常见目录（用户目录、ProgramData）都没有，PATH 里也没有 <code>conda</code>。所以第一步是装它，不是敲命令。</td></tr>
+        <tr><td>系统 Python</td><td>有（3.14）</td><td>可以用，但版本太高。DeepChem 只支持到 3.11，先用 3.14 过 W0、以后还得重装，不如一次到位。</td></tr>
+        <tr><td>w0-starter 目录</td><td><strong style="color:var(--teal)">已存在</strong></td><td><code>README.md / requirements.txt / src/ / data/</code> 都在，等着被跑。</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr>
+
+  <!-- 3 -->
+  <section>
+    <h2><span class="num">03</span>九步，照着做</h2>
+
+    <div class="step">
+      <div class="n">1</div>
+      <div class="body">
+        <div class="st">装 Miniconda</div>
+        <div class="sd">国内建议用清华镜像（快很多）：<br>
+        <code>https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/</code><br>
+        选 <code>Miniconda3-latest-Windows-x86_64.exe</code>，一路默认即可。<br>
+        <strong>安装向导里"Add Miniconda3 to my PATH"这个勾不用选</strong>——装完开始菜单会多一个 "Anaconda Prompt (miniconda3)"，用它就够，勾了反而可能污染系统 PATH。</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="n">2</div>
+      <div class="body">
+        <div class="st">打开 Anaconda Prompt，不要在 VS Code 里操作</div>
+        <div class="sd">开始菜单搜索 <strong>Anaconda Prompt (miniconda3)</strong>，右键 → 以管理员身份运行（第一次建环境更稳）。<br>
+        窗口标题栏会显示 <code>(base)</code>，说明 conda 已经生效。</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="n">3</div>
+      <div class="body">
+        <div class="st">切到项目目录</div>
+        <pre><span class="hl">D:</span>
+<span class="hl">cd D:\WorkBuddy-output\2026-10-19-18-37-44\w0-starter</span>
+<span class="hl">dir</span>   <span class="c"># 应该看到 README.md、requirements.txt、src、data</span></pre>
+        <div class="sd">Anaconda Prompt 本质是 cmd，跨盘符必须先敲 <code>D:</code> 再 <code>cd</code>。<strong><code>dir</code> 能看到 <code>requirements.txt</code> 才算切对。</strong></div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="n">4</div>
+      <div class="body">
+        <div class="st">建环境</div>
+        <pre><span class="hl">conda create -n ai4s python=3.11 -y</span></pre>
+        <div class="sd">等 2–5 分钟。看到 <code>done</code> 和 <code>To activate this environment, use: conda activate ai4s</code> 就是成功。</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="n">5</div>
+      <div class="body">
+        <div class="st">激活环境</div>
+        <pre><span class="hl">conda activate ai4s</span></pre>
+        <div class="sd"><strong>验收：提示符前面从 <code>(base)</code> 变成 <code>(ai4s)</code>。</strong>没变就是没激活，后面装包会全装错地方。</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="n">6</div>
+      <div class="body">
+        <div class="st">装依赖</div>
+        <pre><span class="hl">pip install -r requirements.txt</span></pre>
+        <div class="sd">装 numpy / pandas / matplotlib / scikit-learn / openpyxl，约 2–4 分钟。结尾出现 <code>Successfully installed ...</code> 即可。</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="n">7</div>
+      <div class="body">
+        <div class="st">自检</div>
+        <pre><span class="hl">python src/check_env.py</span></pre>
+        <div class="sd">期望输出：5 行 <code>[OK]</code>，<code>Python : 3.11.x</code>，最后一行 <code>Environment ready. Go to Day 2 (classes).</code><br>
+        出现 <code>[MISS]</code> 就回到第 6 步重装。</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="n">8</div>
+      <div class="body">
+        <div class="st">跑数据脚本</div>
+        <pre><span class="hl">python src/read_data.py</span></pre>
+        <div class="sd">会打印 <code>shape : (20, 7)</code>、每列缺失数、前 5 行。<strong>这就是 Day 4 的原型</strong>——把它换成你自己的数据，任务就完成了。</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="n">9</div>
+      <div class="body">
+        <div class="st">出图</div>
+        <pre><span class="hl">python src/make_plots.py</span></pre>
+        <div class="sd"><code>figures/</code> 下会出现三张 png。打开看一眼，能正常显示就说明整条链路通了。</div>
+      </div>
+    </div>
+
+    <div class="okbox">
+      <div class="t">全部跑通之后，再回到 VS Code</div>
+      <code>Ctrl+Shift+P</code> → 输入 <code>Python: Select Interpreter</code> → 选 <code>ai4s</code> 那个（路径里带 <code>miniconda3\envs\ai4s</code>）。<br>
+      这样 VS Code 里的终端和"运行"按钮才会用对解释器。<strong>但 Day 0 今晚不必做这一步——先在 Anaconda Prompt 里跑通，减少变量。</strong>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 4 -->
+  <section>
+    <h2><span class="num">04</span>报错对照表（存下来，前两周会反复用）</h2>
+    <table>
+      <thead><tr><th style="width:36%">报错原文</th><th style="width:26%">真实原因</th><th style="width:38%">修法</th></tr></thead>
+      <tbody>
+        <tr><td><code>SyntaxError: Invalid syntax</code></td><td>把终端命令写进了 .py 文件</td><td>命令敲在终端里；.py 里只写 Python 代码</td></tr>
+        <tr><td><code>'conda' 不是内部或外部命令</code></td><td>用了系统 cmd / PowerShell，conda 没进 PATH</td><td>换 Anaconda Prompt</td></tr>
+        <tr><td><code>No such file or directory: 'requirements.txt'</code></td><td>当前目录不对</td><td>先 <code>cd</code> 到 w0-starter，用 <code>dir</code> 确认文件在</td></tr>
+        <tr><td><code>ModuleNotFoundError: No module named 'pandas'</code></td><td>没激活环境，或装到了别的环境</td><td><code>conda activate ai4s</code> 后重装；用 <code>where python</code> 确认路径含 <code>envs\ai4s</code></td></tr>
+        <tr><td><code>'python' 不是内部或外部命令</code></td><td>同上，环境没激活</td><td>同上</td></tr>
+        <tr><td><code>pip 不是内部或外部命令</code></td><td>conda 装的时候没带 pip，或环境没激活</td><td><code>conda install pip</code></td></tr>
+        <tr><td>命令执行了但提示符没有 <code>(ai4s)</code></td><td>激活失败或激活后又开了新窗口</td><td>每开一个新窗口都要重新 <code>conda activate ai4s</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr>
+
+  <!-- 5 -->
+  <section>
+    <h2><span class="num">05</span>三个以后永远别做的动作</h2>
+    <ul class="nocheck">
+      <li><strong>不要把终端命令写进 .py。</strong>判断方法：能直接敲进黑框框执行的，就不是 Python 代码。</li>
+      <li><strong>不要用 VS Code 右上角的 ▷ 跑还不确定的文件。</strong>它会用当前选中的解释器执行，一旦解释器是系统 3.14，你的环境就白建了。先用终端 <code>python 文件名.py</code> 手动跑。</li>
+      <li><strong>不要往 base 环境里装包。</strong>base 只放 conda 本身，所有项目各自建 env。这是你以后不重装系统的唯一保障。</li>
+    </ul>
+
+    <div class="infobox">
+      <strong>今晚的最小目标只有一个：</strong>第 7 步的 <code>check_env.py</code> 输出 5 行 <code>[OK]</code>。<br>
+      只要这一行出来了，Day 0 就算过。第 8、9 步跑不通不要紧，明天再弄——但环境必须先立住。
+    </div>
+  </section>
+
+  <footer>
+    生成于 2026-10-19 ｜ 依据本机实测：Miniconda 未安装、系统 Python 3.14、w0-starter 目录已就位。<br>
+    Miniconda 下载页：<code>mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/</code>（清华镜像）或 <code>docs.conda.io/en/latest/miniconda.html</code>（官方）。
+  </footer>
+
+</div>
+</body>
+</html>

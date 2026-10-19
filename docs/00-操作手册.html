@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>操作手册 · 从零到第一次 GPU 计算</title>
+<style>
+  :root{
+    --ink:#16202e; --ink-2:#43536b; --ink-3:#7b8aa1;
+    --line:#e2e8f0; --line-2:#eef2f7;
+    --bg:#ffffff; --surface:#f7f9fc; --blue:#1d4e89; --blue-l:#2f6db5; --blue-bg:#eaf2fb;
+    --teal:#0f766e; --teal-bg:#e8f5f3; --warn:#b42318; --warn-bg:#fdf1ef; --amber:#8a5a00; --amber-bg:#fdf6e7;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:#f0f3f8; color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px; line-height:1.78; -webkit-font-smoothing:antialiased;}
+  .page{max-width:980px; margin:0 auto; background:var(--bg); box-shadow:0 1px 3px rgba(16,32,54,.06);}
+
+  .cover{background:linear-gradient(160deg,#123a66 0%,#1d4e89 55%,#2a6ba8 100%); color:#fff; padding:48px 54px 40px;}
+  .cover .kicker{font-size:11.5px; letter-spacing:.18em; text-transform:uppercase; color:#b9d3ec; margin-bottom:12px;}
+  .cover h1{margin:0 0 10px; font-size:29px; line-height:1.34; font-weight:700;}
+  .cover .sub{font-size:14.5px; color:#d6e6f5; max-width:730px;}
+  .cover .meta{margin-top:22px; display:flex; flex-wrap:wrap; gap:9px;}
+  .chip{display:inline-block; padding:5px 11px; border-radius:100px; font-size:12px; background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.22); color:#eaf3fb;}
+  .chip.hot{background:#ffd9a8; border-color:#ffd9a8; color:#5a3a00; font-weight:600;}
+
+  .toc{padding:30px 54px 34px; background:var(--surface); border-bottom:1px solid var(--line-2);}
+  .toc h2{font-size:14px; margin:0 0 14px; color:var(--ink-3); letter-spacing:.08em; text-transform:uppercase; font-weight:600;}
+  .toc ol{margin:0; padding-left:0; list-style:none; counter-reset:t; columns:2; column-gap:40px;}
+  .toc li{counter-increment:t; font-size:14px; padding:5px 0; break-inside:avoid;}
+  .toc li::before{content:counter(t,decimal-leading-zero); color:var(--blue-l); font-weight:700; font-size:11.5px; margin-right:9px; font-family:ui-monospace,monospace;}
+  .toc a{color:var(--ink); text-decoration:none; border-bottom:1px solid transparent;}
+  .toc a:hover{border-bottom-color:var(--blue-l);}
+
+  section{padding:36px 54px 6px;}
+  section:last-of-type{padding-bottom:50px;}
+  h2.sh{font-size:20px; margin:0 0 6px; display:flex; align-items:baseline; gap:10px;}
+  h2.sh .num{font-size:12px; font-weight:700; color:#fff; background:var(--blue); padding:3px 9px; border-radius:5px; font-family:ui-monospace,monospace;}
+  .lead{color:var(--ink-2); margin:0 0 16px; font-size:14.5px;}
+  p{margin:0 0 12px;}
+  hr{border:0; border-top:1px solid var(--line-2); margin:32px 0 0;}
+
+  .step{border:1px solid var(--line); border-left:4px solid var(--blue-l); border-radius:0 9px 9px 0; padding:18px 22px 16px; margin:16px 0; background:#fff;}
+  .step .hd{display:flex; align-items:baseline; gap:10px; margin-bottom:12px;}
+  .step .sn{font-family:ui-monospace,monospace; font-size:11.5px; font-weight:700; color:#fff; background:var(--blue); padding:2px 8px; border-radius:4px;}
+  .step .tt{font-size:16px; font-weight:700;}
+  .step .tag{margin-left:auto; font-size:11px; padding:2px 8px; border-radius:100px; background:var(--surface); border:1px solid var(--line); color:var(--ink-3); white-space:nowrap;}
+
+  .f{display:grid; grid-template-columns:74px 1fr; gap:6px 14px; margin:9px 0;}
+  .f .k{font-size:11.5px; color:#fff; background:var(--ink-3); border-radius:4px; text-align:center; padding:2px 0; height:22px; line-height:18px; font-weight:600; letter-spacing:.03em;}
+  .f .k.where{background:var(--blue-l);}
+  .f .k.how{background:#0f766e;}
+  .f .k.see{background:#8a5a00;}
+  .f .k.why{background:#5f5e5a;}
+  .f .k.err{background:var(--warn);}
+  .f .v{font-size:14px; line-height:1.72;}
+  .f .v ul{margin:2px 0 0; padding-left:18px;}
+  .f .v li{margin-bottom:4px;}
+
+  pre{background:#1b2534; color:#dfe7f2; padding:12px 15px; border-radius:7px; overflow-x:auto; font-size:12.5px; line-height:1.72; margin:7px 0;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;}
+  pre .c{color:#7f93ad;}
+  pre .hl{color:#8fd0ff;}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; background:var(--surface); padding:1px 5px; border-radius:4px; border:1px solid var(--line);}
+
+  .warnbox{background:var(--warn-bg); border-left:4px solid var(--warn); padding:15px 19px; border-radius:0 8px 8px 0; margin:15px 0;}
+  .warnbox .t{font-weight:700; color:var(--warn); font-size:13.5px; margin-bottom:4px;}
+  .okbox{background:var(--teal-bg); border-left:4px solid var(--teal); padding:15px 19px; border-radius:0 8px 8px 0; margin:15px 0;}
+  .okbox .t{font-weight:700; color:var(--teal); font-size:13.5px; margin-bottom:4px;}
+
+  table{width:100%; border-collapse:collapse; margin:12px 0 6px; font-size:13.5px;}
+  th{text-align:left; font-weight:600; font-size:11.5px; letter-spacing:.05em; color:var(--ink-3); padding:9px 11px; border-bottom:1.5px solid var(--line); background:var(--surface);}
+  td{padding:9px 11px; border-bottom:1px solid var(--line-2); vertical-align:top; line-height:1.62;}
+  tr:last-child td{border-bottom:0;}
+
+  .flow{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:16px 0 6px;}
+  .flow .b{border:1px solid var(--line); border-radius:8px; padding:11px 12px; background:var(--surface); font-size:12.5px; line-height:1.6;}
+  .flow .b b{display:block; font-size:11px; color:var(--blue-l); letter-spacing:.05em; margin-bottom:3px; font-family:ui-monospace,monospace;}
+
+  footer{padding:24px 54px 42px; color:var(--ink-3); font-size:12px; border-top:1px solid var(--line-2);}
+  @media (max-width:820px){
+    section,.cover,.toc,footer{padding-left:20px; padding-right:20px;}
+    .toc ol{columns:1;} .flow{grid-template-columns:1fr 1fr;}
+    .f{grid-template-columns:1fr;} .f .k{width:70px;}
+    .cover h1{font-size:23px;}
+  }
+  @media print{ body{background:#fff;} .page{box-shadow:none; max-width:none;} .step{page-break-inside:avoid;} }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="cover">
+    <div class="kicker">Manual · Desktop / project</div>
+    <h1>操作手册：从零到第一次 GPU 计算</h1>
+    <div class="sub">14 个步骤，每一步都写清楚「去哪里、怎么做、应该看到什么、为什么这么做、出错了怎么办」。按顺序做，不要跳。</div>
+    <div class="meta">
+      <span class="chip">总耗时 3–5 小时</span>
+      <span class="chip">RTX 5060 Ti</span>
+      <span class="chip hot">目标：W1 结束时能算 Bi₂WO₆</span>
+    </div>
+  </div>
+
+  <div class="toc">
+    <h2>目录</h2>
+    <ol>
+      <li><a href="#s1">装 Miniconda</a></li>
+      <li><a href="#s2">打开正确的终端</a></li>
+      <li><a href="#s3">进入 project 目录</a></li>
+      <li><a href="#s4">建 conda 环境</a></li>
+      <li><a href="#s5">激活环境</a></li>
+      <li><a href="#s6">装 GPU 版 PyTorch</a></li>
+      <li><a href="#s7">验证 GPU（关键）</a></li>
+      <li><a href="#s8">装科学计算包</a></li>
+      <li><a href="#s9">装 MACE 与 ASE</a></li>
+      <li><a href="#s10">装完 MACE 后重验</a></li>
+      <li><a href="#s11">第一次真实计算</a></li>
+      <li><a href="#s12">第二次计算与对比</a></li>
+      <li><a href="#s13">推到 GitHub</a></li>
+      <li><a href="#s14">W1 复盘</a></li>
+    </ol>
+  </div>
+
+  <!-- 全流程 -->
+  <section>
+    <h2 class="sh"><span class="num">00</span>先看全景：你接下来要干什么</h2>
+    <p class="lead">这 14 步其实是四个阶段。知道自己处在哪一段，卡住时才不会慌。</p>
+
+    <div class="flow">
+      <div class="b"><b>阶段 A · 1–5</b>把"跑的容器"建好。装 conda、建独立环境、激活。这一步没有任何科学内容，纯粹是基建。</div>
+      <div class="b"><b>阶段 B · 6–10</b>把"能算 GPU 的引擎"装对。这是唯一有技术陷阱的地方（sm_120）。</div>
+      <div class="b"><b>阶段 C · 11–12</b>第一次让 AI 替你做物理计算。从这一刻起你才算进入 AI4Science。</div>
+      <div class="b"><b>阶段 D · 13–14</b>把成果变成"作品"。没有这一步，前面全白做。</div>
+    </div>
+
+    <div class="okbox">
+      <div class="t">开工前 60 秒自检</div>
+      ① 桌面上有 <code>project</code> 文件夹吗？<br>
+      ② 打开"开始"菜单搜 <code>Anaconda Prompt</code>，有没有结果？<br>
+      ③ 在任意终端敲 <code>nvidia-smi</code>，右上角 <code>CUDA Version</code> 是不是 ≥ 12.8？<br>
+      三个都是"是"→ 从第 3 步开始；第一个"否"→ 先跑 <code>sync.bat</code>；第二个"否"→ 从第 1 步开始；第三个"否"→ 先更新显卡驱动。
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 1 -->
+  <section id="s1">
+    <h2 class="sh"><span class="num">01</span>装 Miniconda</h2>
+    <p class="lead">这是唯一需要下载安装包的一步。装完之后，所有 Python 相关的事都在它的终端里做。</p>
+
+    <div class="step">
+      <div class="hd"><span class="sn">STEP 1</span><span class="tt">下载并安装 Miniconda</span><span class="tag">约 10 分钟</span></div>
+
+      <div class="f"><div class="k where">去哪里</div><div class="v">浏览器打开清华镜像：<br><code>https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/</code><br>在列表里找 <code>Miniconda3-latest-Windows-x86_64.exe</code>，点它下载。</div></div>
+
+      <div class="f"><div class="k how">怎么做</div><div class="v">
+        双击安装包，一路点 Next，但在这两个地方停一下：
+        <ul>
+          <li><strong>安装路径</strong>：保持默认（<code>C:\Users\Administrator\miniconda3</code>）。<strong>路径里不要有中文、不要有空格</strong>。</li>
+          <li><strong>"Add Miniconda3 to my PATH environment variable"</strong> → <strong>不勾</strong>。</li>
+          <li>最后 <strong>"Register Miniconda3 as my default Python"</strong> → 可勾可不勾，勾了也不影响。</li>
+        </ul>
+      </div></div>
+
+      <div class="f"><div class="k see">应该看到</div><div class="v">安装完成后，开始菜单里出现一个文件夹 "Miniconda3 (64-bit)"，里面有 <strong>Anaconda Prompt (miniconda3)</strong>。这就够了。</div></div>
+
+      <div class="f"><div class="k why">为什么</div><div class="v">
+        <ul>
+          <li><strong>为什么用镜像不用官网：</strong>官网在国内经常几十 KB/s，镜像能跑满带宽。同一个文件，官方要 40 分钟，镜像 3 分钟。</li>
+          <li><strong>为什么不用 Anaconda：</strong>Anaconda 装完 3–5 GB，预装几百个你这辈子不会用的包。Miniconda 只有 conda + Python，200 MB。你要什么装什么。</li>
+          <li><strong>为什么不勾 PATH：</strong>你机器上已经有一个 Python 3.14（VS Code 之前用的就是它）。把 conda 塞进 PATH 会让这两个抢"谁是 python"，最典型的症状是——你明明激活了环境，<code>python</code> 却还是 3.14。<strong>不勾 PATH，用专用的 Anaconda Prompt，两者互不干扰。</strong></li>
+        </ul>
+      </div></div>
+
+      <div class="f"><div class="k err">出错了</div><div class="v">安装到一半报"写入失败"→ 右键安装包选"以管理员身份运行"。<br>装完开始菜单搜不到 → 重启一次资源管理器，或在 <code>C:\Users\Administrator\miniconda3\Scripts</code> 里找 <code>activate.bat</code>。</div></div>
+    </div>
+
+    <div class="warnbox">
+      <div class="t">⚠️ 最容易犯的错：从镜像目录里点了老版本</div>
+      清华镜像的目录是<strong>按文件名排序</strong>的，<code>Miniconda3-py38_4.8.2</code>、<code>Miniconda3-py39_4.9.2</code> 这些 2020–2021 年的老包排在最前面，<code>Miniconda3-latest</code> 反而在中间。<strong>顺手点第一个 = 装回五年前。</strong><br><br>
+      <strong>判断标准：</strong>装完在 Anaconda Prompt 敲 <code>conda --version</code>，<strong>主版本号应该是 25.x</strong>。如果显示 <code>4.9.2</code>、<code>4.12.0</code> 这类，就是装错了。
+    </div>
+
+    <h3 style="font-size:15px;margin:22px 0 6px;">装错了怎么办：干净重装（5 步）</h3>
+    <p style="font-size:14px;color:var(--ink-2);margin-bottom:10px;">
+      老版 conda 不能靠"升级"救回来——<strong>conda 4.9.2 的依赖求解器不认识 2026 年的 repodata 格式</strong>，你后面跑 <code>conda create -n ai4s python=3.11</code> 大概率直接 <code>Solving environment: failed</code>。重装比修复快得多，也更干净。
+    </p>
+
+    <table>
+      <thead><tr><th style="width:8%">步</th><th style="width:46%">做什么</th><th style="width:46%">为什么 / 注意</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="strong">1</td>
+          <td>关掉<strong>所有</strong>终端窗口、VS Code、Jupyter</td>
+          <td>有进程占用文件时卸载会失败或残留</td>
+        </tr>
+        <tr>
+          <td class="strong">2</td>
+          <td>运行 <code>C:\ProgramData\miniconda3\Uninstall-Miniconda3.exe</code></td>
+          <td><strong>用这个卸载器，不要直接删文件夹。</strong>直接删会留下注册表项和开始菜单快捷方式，下次装的时候会打架</td>
+        </tr>
+        <tr>
+          <td class="strong">3</td>
+          <td>确认 <code>C:\ProgramData\miniconda3</code> 已经消失；再检查 <code>C:\Users\Administrator\.conda</code> 和 <code>.condarc</code>，有就删掉</td>
+          <td>这两个是用户级配置，卸载器不管。<strong>不删的话，新装的 Miniconda 会继承旧配置</strong></td>
+        </tr>
+        <tr>
+          <td class="strong">4</td>
+          <td>重新下载 <code>Miniconda3-latest-Windows-x86_64.exe</code></td>
+          <td>文件名里必须带 <code>latest</code>，<strong>不要带 <code>py38</code> / <code>py39</code> / 版本号</strong></td>
+        </tr>
+        <tr>
+          <td class="strong">5</td>
+          <td>安装时选 <strong>Just Me</strong>（装到 <code>C:\Users\Administrator\miniconda3</code>）；<strong>不勾</strong> Add to PATH；<strong>不勾</strong> Register as default Python</td>
+          <td><strong>为什么这次选 Just Me：</strong>装在 <code>ProgramData</code> 是"所有用户"安装，之后每次 pip 装包都要管理员权限，麻烦不断</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="okbox">
+      <div class="t">重装完的验收标准</div>
+      打开新的 <strong>Anaconda Prompt (miniconda3)</strong>，敲 <code>conda --version</code> → 显示 <code>conda 25.x.x</code>；敲 <code>python --version</code> → 显示 <code>Python 3.1x.x</code>（base 里是 3.12 或 3.13 都正常，<strong>不重要</strong>——你要的 3.11 是在 STEP 4 新建环境时指定的）。<br>
+      两条都对，就可以继续 STEP 2。
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 2 -->
+  <section id="s2">
+    <h2 class="sh"><span class="num">02</span>打开正确的终端</h2>
+
+    <div class="step">
+      <div class="hd"><span class="sn">STEP 2</span><span class="tt">用 Anaconda Prompt，不要用 VS Code 的终端</span><span class="tag">1 分钟</span></div>
+
+      <div class="f"><div class="k where">去哪里</div><div class="v">Windows 开始菜单 → 直接输入 <code>anaconda</code> → 出现 <strong>Anaconda Prompt (miniconda3)</strong> → 点开。</div></div>
+
+      <div class="f"><div class="k how">怎么做</div><div class="v">
+        打开后什么都不用做，先看提示符长什么样。然后敲一条命令确认：
+        <pre><span class="hl">conda --version</span></pre>
+      </div></div>
+
+      <div class="f"><div class="k see">应该看到</div><div class="v">
+        窗口最左边显示 <code>(base)</code>，命令提示符类似：<br>
+        <code>(base) C:\Users\Administrator&gt;</code><br>
+        敲完 <code>conda --version</code> 返回 <code>conda 25.x.x</code> 之类的版本号。
+      </div></div>
+
+      <div class="f"><div class="k why">为什么</div><div class="v">
+        <ul>
+          <li><strong>为什么不用 VS Code 的终端：</strong>VS Code 默认终端是 PowerShell，它<strong>不会加载 conda 的初始化脚本</strong>。你在里面敲 <code>conda</code> 会得到"不是内部或外部命令"。这不是 conda 坏了，是你在错误的房间里。<strong>你之前那个 SyntaxError 的截图，就是在 VS Code 里操作的。</strong></li>
+          <li><strong>为什么先看提示符：</strong><code>(base)</code> 这两个字是"conda 已生效"的唯一证据。后面每一步都要靠提示符判断你在哪个环境里。</li>
+        </ul>
+      </div></div>
+
+      <div class="f"><div class="k err">出错了</div><div class="v"><code>'conda' 不是内部或外部命令</code> → 你开的是 cmd 或 PowerShell。关掉，回来用开始菜单里的 Anaconda Prompt。</div></div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 3 -->
+  <section id="s3">
+    <h2 class="sh"><span class="num">03</span>进入 project 目录</h2>
+
+    <div class="step">
+      <div class="hd"><span class="sn">STEP 3</span><span class="tt">把终端"站"到项目文件夹里</span><span class="tag">1 分钟</span></div>
+
+      <div class="f"><div class="k where">去哪里</div><div class="v">还是在 Anaconda Prompt 里。目标目录是 <code>C:\Users\Administrator\Desktop\project</code>。</div></div>
+
+      <div class="f"><div class="k how">怎么做</div><div class="v">
+        <pre><span class="hl">cd C:\Users\Administrator\Desktop\project</span>
+<span class="hl">dir</span></pre>
+        如果桌面路径不是这个（比如 OneDrive 重定向过），先在文件资源管理器里打开 project 文件夹，<strong>点一下地址栏，把路径复制下来</strong>，再 <code>cd</code> 过去。
+      </div></div>
+
+      <div class="f"><div class="k see">应该看到</div><div class="v">
+        <code>dir</code> 列出这些东西：<code>README.md</code>、<code>requirements.txt</code>、<code>src</code>、<code>data</code>、<code>docs</code>、<code>figures</code>、<code>sync.bat</code>。<br>
+        <strong>看不到 <code>requirements.txt</code> 就是没切对目录。</strong>
+      </div></div>
+
+      <div class="f"><div class="k why">为什么</div><div class="v">
+        <ul>
+          <li>后面的 <code>pip install -r requirements.txt</code> 和 <code>python src/xxx.py</code> 都是<strong>相对当前目录</strong>找文件的。不在这个目录，它会报 <code>No such file or directory</code>——你之前那个报错里就有这一层。</li>
+          <li>另外，脚本里用 <code>pathlib</code> 按"脚本所在位置"推路径，所以你从哪个目录启动都不该崩；但养成"先 cd 到项目根"的习惯，能省掉 90% 的路径问题。</li>
+        </ul>
+      </div></div>
+
+      <div class="f"><div class="k err">出错了</div><div class="v">
+        <code>系统找不到指定的路径</code> → 桌面被 OneDrive 接管了，真实路径可能是 <code>C:\Users\Administrator\OneDrive\Desktop\project</code>。用资源管理器地址栏复制真实路径。<br>
+        <strong>小技巧：</strong>在资源管理器里打开 project，点地址栏输入 <code>cmd</code> 回车，会直接在该目录开一个终端。
+      </div></div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 4 -->
+  <section id="s4">
+    <h2 class="sh"><span class="num">04</span>建 conda 环境</h2>
+
+    <div class="step">
+      <div class="hd"><span class="sn">STEP 4</span><span class="tt">创建一个叫 ai4s 的独立环境</span><span class="tag">2–5 分钟</span></div>
+
+      <div class="f"><div class="k where">去哪里</div><div class="v">Anaconda Prompt，仍在 project 目录下。</div></div>
+
+      <div class="f"><div class="k how">怎么做</div><div class="v">
+        <pre><span class="hl">conda create -n ai4s python=3.11 -y</span></pre>
+        等它跑完。会下载 Python 3.11 和一批基础依赖，大约 100–200 MB。
+      </div></div>
+
+      <div class="f"><div class="k see">应该看到</div><div class="v">
+        进度条走完，出现 <code>done</code>，最后两行类似：<br>
+        <code>To activate this environment, use</code><br>
+        <code>conda activate ai4s</code>
+      </div></div>
+
+      <div class="f"><div class="k why">为什么</div><div class="v">
+        <ul>
+          <li><strong>为什么是 3.11，不是 3.13/3.14：</strong>MACE 要求 ≥3.11；而 3.12 以后不少科学计算包（尤其是需要编译的）还没跟上。<strong>3.11 是 2026 年这个生态里最稳的版本</strong>，几乎所有 AI4Science 项目都在 3.10/3.11 上测过。</li>
+          <li><strong>为什么不用系统那个 3.14：</strong>一是版本太高，二是你迟早会把某个包装崩——装在独立环境里，崩了删掉重建，5 分钟的事；装在系统里，崩了就是重装 Python。</li>
+          <li><strong>为什么不装进 base：</strong>base 是 conda 自己的家。往里面装东西，装得越多越容易坏，而且坏了没得修。<strong>base 只放 conda，项目各建各的</strong>，这是唯一能让你三年不用重装系统的纪律。</li>
+        </ul>
+      </div></div>
+
+      <div class="f"><div class="k err">出错了</div><div class="v">
+        卡在 <code>Solving environment</code> 很久 → 正常，第一次可能 3–5 分钟。<br>
+        <strong><code>CondaToSNonInteractiveError</code> → 见下方专门一节，这是 2025 年后必踩的新坑。</strong>
+      </div></div>
+    </div>
+
+    <div class="warnbox">
+      <div class="t">⚠️ 2025 年后新增的坑：CondaToSNonInteractiveError</div>
+      <strong>报错长这样：</strong><br>
+      <code>CondaToSNonInteractiveError: Terms of Service have not been accepted for the following channels:</code><br>
+      <code>- https://repo.anaconda.com/pkgs/main</code><br>
+      <code>- https://repo.anaconda.com/pkgs/r</code><br>
+      <code>- https://repo.anaconda.com/pkgs/msys2</code><br><br>
+
+      <strong>为什么会这样：</strong>2025 年 7 月起，Anaconda 改了服务条款，给 conda 装了一个叫 <code>conda-anaconda-tos</code> 的插件。你第一次使用 <code>defaults</code> 渠道时装包，它要求你<strong>明确同意条款</strong>。<br>
+      如果你在终端里手动敲命令，它会弹一个 <code>Do you accept?</code> 让你回答；但你的命令里带了 <code>-y</code>（自动回答 yes），<strong>conda 没有机会弹窗，就直接判为"未同意"并中止</strong>。<br><br>
+
+      <strong>后果：环境根本没建出来。</strong>所以紧接着的 <code>conda activate ai4s</code> 会报 <code>EnvironmentNameNotFound</code>——那不是第二个错误，是同一个错误的回响。<br><br>
+
+      <strong>许可说明（放心）：</strong>个人使用、学术研究免费。<strong>只有当你的公司是 200 人以上的营利机构</strong>时才需要买商业许可。你是博士生，正常接受即可。
+    </div>
+
+    <h3 style="font-size:15px;margin:22px 0 6px;">解法：先接受条款，再建环境</h3>
+    <p style="font-size:14px;color:var(--ink-2);margin-bottom:10px;">
+      在 Anaconda Prompt 里<strong>逐条复制粘贴</strong>下面三行（URL 很长，别手打）：
+    </p>
+
+    <pre><span class="hl">conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main</span>
+<span class="hl">conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r</span>
+<span class="hl">conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/msys2</span></pre>
+
+    <p style="font-size:14px;color:var(--ink-2);">执行后不会有成功提示，直接回到提示符就是成功了。然后<strong>重新执行 STEP 4</strong>：</p>
+
+    <pre><span class="hl">conda create -n ai4s python=3.11 -y</span>
+<span class="hl">conda activate ai4s</span>
+<span class="hl">python --version</span></pre>
+
+    <div class="okbox">
+      <div class="t">这一步的"为什么"值得记住</div>
+      这类报错最容易让人怀疑自己操作错了。判断方法：<strong>看报错里有没有出现"Terms of Service""license""accept"这类字眼</strong>——出现就说明是合规/授权问题，不是语法问题，命令本身没写错。<br>
+      顺带一提，学术界更常用的替代方案是 <strong>conda-forge</strong> 社区渠道（无 ToS 限制、包更新更快）。等你熟悉 conda 之后可以切过去；现在先别动，一次只改一个变量。</div>
+  </section>
+
+  <hr>
+
+  <!-- 5 -->
+  <section id="s5">
+    <h2 class="sh"><span class="num">05</span>激活环境</h2>
+
+    <div class="step">
+      <div class="hd"><span class="sn">STEP 5</span><span class="tt">从 base 切到 ai4s</span><span class="tag">10 秒</span></div>
+
+      <div class="f"><div class="k where">去哪里</div><div class="v">Anaconda Prompt。</div></div>
+
+      <div class="f"><div class="k how">怎么做</div><div class="v">
+        <pre><span class="hl">conda activate ai4s</span>
+<span class="hl">python --version</span></pre>
+      </div></div>
+
+      <div class="f"><div class="k see">应该看到</div><div class="v">
+        提示符从 <code>(base)</code> 变成 <code>(ai4s)</code>：<br>
+        <code>(ai4s) C:\Users\Administrator\Desktop\project&gt;</code><br>
+        <code>python --version</code> 返回 <code>Python 3.11.x</code>。
+      </div></div>
+
+      <div class="f"><div class="k why">为什么</div><div class="v">
+        <ul>
+          <li><code>pip install</code> 会把包装进<strong>当前激活的那个环境</strong>。没激活，就装进 base——你以为装好了，实际装到了另一个房间。</li>
+          <li><strong>每开一个新窗口，都要重新 activate。</strong>这不是 bug，是设计。忘一次，就会得到 <code>ModuleNotFoundError</code>。</li>
+        </ul>
+      </div></div>
+
+      <div class="f"><div class="k err">出错了</div><div class="v">提示符没变 → 命令拼错了，或第 4 步没成功。用 <code>conda env list</code> 看 ai4s 在不在列表里。</div></div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 6 -->
+  <section id="s6">
+    <h2 class="sh"><span class="num">06</span>装 GPU 版 PyTorch（最关键的一步）</h2>
+    <p class="lead">你前面所有步骤都是准备工作，真正的技术陷阱在这一步。装错这一个包，后面全部报错，而且报错信息会误导你。</p>
+
+    <div class="step">
+      <div class="hd"><span class="sn">STEP 6</span><span class="tt">装 cu128 版 PyTorch</span><span class="tag">下载约 2.5 GB</span></div>
+
+      <div class="f"><div class="k where">去哪里</div><div class="v">Anaconda Prompt，提示符是 <code>(ai4s)</code>，目录是 project。</div></div>
+
+      <div class="f"><div class="k how">怎么做</div><div class="v">
+        <pre><span class="hl">pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128</span></pre>
+        下载 + 安装 5–15 分钟，取决于网速。中途不要关窗口。
+      </div></div>
+
+      <div class="f"><div class="k see">应该看到</div><div class="v">
+        结尾 <code>Successfully installed torch-2.x.x+cu128 ...</code><br>
+        确认一下：<code>pip show torch</code>，<code>Version</code> 那一行必须带 <strong><code>+cu128</code></strong>。
+      </div></div>
+
+      <div class="f"><div class="k why">为什么</div><div class="v">
+        <ul>
+          <li><strong>为什么必须带 <code>--index-url</code>：</strong>PyPI 默认给你的是<strong>CPU 版</strong>。不加这个参数，装完也能 import，但 GPU 完全用不上——这是新手最常见的"我的显卡好像没生效"。</li>
+          <li><strong>为什么必须是 cu128：</strong>你的 5060 Ti 是 Blackwell 架构，代号 <strong>sm_120</strong>。cu121 / cu124 / cu126 这些轮子在编译的时候 sm_120 还不存在，所以里面<strong>没有对应内核</strong>。<strong>升级驱动也救不了</strong>——缺的是编译进去的机器码，不是驱动版本。</li>
+          <li><strong>为什么不用装 CUDA Toolkit：</strong>cu128 的 wheel 里已经打包了 CUDA runtime 和 cuDNN。<strong>你只需要显卡驱动够新</strong>（R570 以上）。网上让你先装 3 GB Toolkit、配环境变量的教程是 2020 年的做法，现在照做只会多三个故障点。</li>
+        </ul>
+      </div></div>
+
+      <div class="f"><div class="k err">出错了</div><div class="v">
+        网速极慢 → 加国内镜像（不推荐，镜像的 cu128 轮子常不全）；更稳的是挂代理。<br>
+        <code>Could not find a version that satisfies</code> → 检查是不是拼错了 <code>cu128</code>。<br>
+        装完 <code>pip show torch</code> 没有 <code>+cu128</code> → 你没加 <code>--index-url</code>，重来。
+      </div></div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 7 -->
+  <section id="s7">
+    <h2 class="sh"><span class="num">07</span>验证 GPU（不要跳这一步）</h2>
+
+    <div class="step">
+      <div class="hd"><span class="sn">STEP 7</span><span class="tt">跑 check_gpu.py</span><span class="tag">30 秒</span></div>
+
+      <div class="f"><div class="k where">去哪里</div><div class="v">Anaconda Prompt，<code>(ai4s)</code> 环境，project 目录。</div></div>
+
+      <div class="f"><div class="k how">怎么做</div><div class="v">
+        <pre><span class="hl">python src/check_gpu.py</span></pre>
+      </div></div>
+
+      <div class="f"><div class="k see">应该看到</div><div class="v">
+        <pre><span class="c">==========================================================</span>
+Python : 3.11.x
+torch  : 2.x.x+cu128
+cuda   : 12.8
+<span class="c">==========================================================</span>
+GPU    : NVIDIA GeForce RTX 5060 Ti
+算力   : sm_120
+显存   : 7.9 GB
+编译架构: sm_75 sm_80 sm_86 sm_90 sm_100 sm_120
+含 sm_120 内核: 是
+<span class="c">----------------------------------------------------------</span>
+[OK] fp16 矩阵乘 512x512 : 中位数 0.065 ms (min 0.063)
+[OK] fp16 矩阵乘 2048x2048: 中位数 0.423 ms  ≈ 40.6 TFLOPS
+     (RTX 5060 Ti 参考值：30–50 TFLOPS，明显低于 20 说明有问题)
+[OK] 训练一步           : loss=1.0719
+<span class="c">==========================================================</span>
+VERDICT: GPU 可用，可以进入 W1。</pre>
+        <p style="font-size:13px;color:var(--ink-2);margin-top:6px;">以上是这台机器（RTX 5060 Ti 8 GB / torch 2.11.0+cu128）的实测值，你的输出应该基本一致。</p>
+      </div></div>
+
+      <div class="f"><div class="k why">为什么</div><div class="v">
+        <ul>
+          <li><strong>因为 <code>torch.cuda.is_available()</code> 会撒谎。</strong>它只检查"系统有没有看到显卡"，不检查"PyTorch 里有没有这张卡能用的内核"。装错版本时它照样返回 <code>True</code>，<code>tensor.cuda()</code> 也照样成功——因为<strong>分配显存不需要计算内核</strong>。直到你真正做一次矩阵乘，才会炸出 <code>no kernel image is available</code>。</li>
+          <li>所以这个脚本做的两件事——fp16 矩阵乘、训练一步——<strong>才是唯一有效的验收</strong>。看到 <code>[OK]</code> 这两个字，你才算真的能用 GPU。</li>
+          <li><strong>为什么脚本要先"预热"再计时：</strong>第一次 CUDA 运算会初始化 cuBLAS 并加载 sm_120 内核，这一步要花十几秒。<strong>如果直接计时，0.065 ms 的运算会被测成 696 ms</strong>——这个数字真实出现过，当时差点误判成"显卡有问题"。所以脚本先空跑 10 次，再逐次计时取中位数。<strong>以后你测任何 GPU 性能，都要先预热。</strong></li>
+          <li><strong>如果这一步过了，你就绕过了 90% 的 50 系用户会踩的坑。</strong></li>
+        </ul>
+      </div></div>
+
+      <div class="f"><div class="k err">出错了</div><div class="v">
+        <code>no kernel image is available</code> → 装的是非 cu128 版本，卸了重装：<br>
+        <code>pip uninstall -y torch torchvision torchaudio</code> 然后回第 6 步。<br>
+        <code>Torch not compiled with CUDA enabled</code> → 装成 CPU 版了，同上。<br>
+        <code>Found no NVIDIA driver</code> → 驱动太旧，去 NVIDIA 官网更新。
+      </div></div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 8 -->
+  <section id="s8">
+    <h2 class="sh"><span class="num">08</span>装科学计算包</h2>
+
+    <div class="step">
+      <div class="hd"><span class="sn">STEP 8</span><span class="tt">pandas / matplotlib / sklearn</span><span class="tag">2–3 分钟</span></div>
+
+      <div class="f"><div class="k where">去哪里</div><div class="v">Anaconda Prompt，<code>(ai4s)</code> 环境，project 目录。</div></div>
+
+      <div class="f"><div class="k how">怎么做</div><div class="v">
+        <pre><span class="hl">pip install -r requirements.txt</span>
+<span class="hl">python src/check_env.py</span></pre>
+      </div></div>
+
+      <div class="f"><div class="k see">应该看到</div><div class="v">五行 <code>[OK]</code>，然后是 <code>Environment ready.</code>。</div></div>
+
+      <div class="f"><div class="k why">为什么</div><div class="v">
+        <ul>
+          <li><strong>为什么放在 torch 之后：</strong>反过来的话，某个包对 numpy 版本有要求，pip 可能顺手重装一批依赖，把 torch 的依赖树搅乱。<strong>先立主干，再挂枝叶。</strong></li>
+          <li>这五个包是整个流程的地基：pandas 处理表格、matplotlib 出图、sklearn 做基线模型、openpyxl 读 Excel。后面的 MACE 也要靠 numpy。</li>
+        </ul>
+      </div></div>
+
+      <div class="f"><div class="k err">出错了</div><div class="v"><code>No such file or directory: 'requirements.txt'</code> → 你不在 project 目录，回第 3 步。</div></div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 9 -->
+  <section id="s9">
+    <h2 class="sh"><span class="num">09</span>装 MACE 与 ASE</h2>
+
+    <div class="step">
+      <div class="hd"><span class="sn">STEP 9</span><span class="tt">装通用势函数框架</span><span class="tag">3–5 分钟</span></div>
+
+      <div class="f"><div class="k where">去哪里</div><div class="v">Anaconda Prompt，<code>(ai4s)</code> 环境，project 目录。</div></div>
+
+      <div class="f"><div class="k how">怎么做</div><div class="v">
+        <pre><span class="hl">pip install "mace-torch==0.3.*" ase</span></pre>
+        <strong>引号不能省。</strong>在有些 shell 里 <code>==0.3.*</code> 会被当成通配符展开。
+      </div></div>
+
+      <div class="f"><div class="k see">应该看到</div><div class="v"><code>Successfully installed mace-torch-0.3.x ase-3.x ...</code><br>跑 <code>pip show mace-torch</code> 确认版本以 0.3 开头。</div></div>
+
+      <div class="f"><div class="k why">为什么</div><div class="v">
+        <ul>
+          <li><strong>为什么锁 0.3.*：</strong>MACE 的 v1.0 正在 <code>mace-reforge</code> 分支<strong>重写</strong>，官方明确写了"不保证兼容，检查点要通过转换器迁移"。你直接 <code>pip install mace-torch</code> 装 latest，有可能进到一条还在天天变的代码线上，网上搜到的教程全部对不上。</li>
+          <li><strong>为什么装 ase：</strong>MACE 本身只负责"给结构算能量和力"，是 ASE 提供了"读 CIF、做弛豫、存轨迹"这一整套原子模拟的通用接口。两者是"引擎 + 车架"的关系。</li>
+          <li><strong>为什么不装 <code>cuequivariance</code>、<code>flash-attn</code>：</strong>这些是加速插件，需要本地编译，Windows 上环境要求苛刻。<strong>它们能让你快 20%，但会让你卡三天。</strong>现在不需要。</li>
+        </ul>
+      </div></div>
+
+      <div class="f"><div class="k err">出错了</div><div class="v"><code>Microsoft Visual C++ 14.0 required</code> → 某个依赖想本地编译。装 "Microsoft C++ Build Tools" 太重；更好的做法是先看是哪个包，很多情况下换个版本就不用编译。<br>装完 pip 说 "Attempting uninstall: torch" → <strong>立刻警惕</strong>，见下一步。</div></div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 10 -->
+  <section id="s10">
+    <h2 class="sh"><span class="num">10</span>装完 MACE 后重验 GPU</h2>
+
+    <div class="step">
+      <div class="hd"><span class="sn">STEP 10</span><span class="tt">再跑一次 check_gpu.py</span><span class="tag">30 秒</span></div>
+
+      <div class="f"><div class="k where">去哪里</div><div class="v">同一个终端。</div></div>
+
+      <div class="f"><div class="k how">怎么做</div><div class="v">
+        <pre><span class="hl">python src/check_gpu.py</span>
+<span class="hl">pip show torch</span></pre>
+      </div></div>
+
+      <div class="f"><div class="k see">应该看到</div><div class="v">和第 7 步<strong>完全一样</strong>的输出：<code>VERDICT: GPU 可用</code>，且 <code>pip show torch</code> 里仍然带 <code>+cu128</code>。</div></div>
+
+      <div class="f"><div class="k why">为什么（这一步最容易被跳，也最容易出事）</div><div class="v">
+        <ul>
+          <li><code>pip</code> 在装 MACE 时会重新解析依赖树。如果 MACE 声明的是 <code>torch&gt;=2.0</code> 而你装的是 2.13，理论上不会动；但如果某个传递依赖对 torch 有<strong>版本上限</strong>，pip 会"贴心"地帮你降级到它满意的版本——<strong>而那个版本很可能不带 cu128 轮子</strong>。</li>
+          <li>降级是<strong>静默的</strong>。你不会看到报错，只会在第 11 步遇到一堆莫名其妙的 CUDA 错误，然后怀疑人生。</li>
+          <li><strong>规则：每次 <code>pip install</code> 大包之后，都重跑一次 GPU 自检。</strong>这条习惯能帮你省掉未来 80% 的玄学问题。</li>
+        </ul>
+      </div></div>
+
+      <div class="f"><div class="k err">出错了</div><div class="v">GPU 挂了 → <code>pip install --force-reinstall torch --index-url https://download.pytorch.org/whl/cu128</code>，再验证一次。</div></div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 11 -->
+  <section id="s11">
+    <h2 class="sh"><span class="num">11</span>第一次真实计算</h2>
+    <p class="lead">从这一步开始，你不再是在"装环境"，而是在做 AI4Science 了。</p>
+
+    <div class="step">
+      <div class="hd"><span class="sn">STEP 11</span><span class="tt">用 MACE 弛豫 18 原子 Bi₂WO₆</span><span class="tag">首次下载权重 2–5 分钟</span></div>
+
+      <div class="f"><div class="k where">去哪里</div><div class="v">Anaconda Prompt，<code>(ai4s)</code> 环境，project 目录。<br>结构文件已在 <code>data/structures/</code>。</div></div>
+
+      <div class="f"><div class="k how">怎么做</div><div class="v">
+        <pre><span class="hl">python src/relax_bi2wo6.py --gpu</span></pre>
+        第一次跑会下载 MACE-MP 权重（几百 MB）。<strong>屏幕可能静止 2–5 分钟，那不是死机</strong>，是在下载。
+      </div></div>
+
+      <div class="f"><div class="k see">应该看到</div><div class="v">
+        <pre>结构   : Bi2WO6_ICSD23584.cif
+原子数 : 18 | Bi4O12W2
+晶胞   : a=8.917 b=8.917 c=5.548 Å
+设备   : cuda
+加载 MACE 权重...
+<span class="c">----------------------------------------------------------</span>
+初始能量 : -xx.xxxx eV  (-x.xxxx eV/atom)
+初始最大力: x.xxx eV/Å
+开始弛豫 (BFGS, fmax=0.05, 最多 300 步)...
+      Step     Time          Energy         fmax
+<span class="c">...</span>
+<span class="c">----------------------------------------------------------</span>
+弛豫后能量 : -xx.xxxx eV  (-x.xxxx eV/atom)
+弛豫后最大力: 0.0xx eV/Å
+能量下降   : 0.0xxx eV/atom
+是否收敛   : 是
+已保存     : data\relaxed\Bi2WO6_23584_relaxed.cif</pre>
+      </div></div>
+
+      <div class="f"><div class="k why">为什么</div><div class="v">
+        <ul>
+          <li><strong>"弛豫"是什么：</strong>晶体里原子不是随便待着的，它们会往能量最低的位置挪。弛豫就是让每个原子受的力趋近于零（<code>fmax &lt; 0.05 eV/Å</code>），得到稳定的几何结构。你以后算吸附能、算反应路径，前提都是结构已经弛豫好——<strong>拿一个没弛豫的结构去算能量，结果没有意义</strong>。</li>
+          <li><strong>为什么这件事重要：</strong>传统上这一步要用 DFT，18 个原子大概几小时到几天。MACE 用预训练神经网络势函数，把它压到<strong>几十秒</strong>。这就是 AI4Science 最朴素的形态——<strong>不是让 AI 写论文，是让 AI 把 DFT 的重复劳动加速 1000 倍</strong>。</li>
+          <li><strong>为什么先用 18 原子：</strong>它是原胞，最小、最快，用来验证"整条链路通不通"。先跑通再谈精度。</li>
+        </ul>
+      </div></div>
+
+      <div class="f"><div class="k err">出错了</div><div class="v">
+        <code>AttributeError: module 'mace.calculators' has no attribute 'mace_mp'</code> → 版本太老/太新。跑 <code>python -c "import mace; print(mace.__version__)"</code> 看版本，必要时 <code>pip install "mace-torch==0.3.14"</code> 指定具体版本。<br>
+        权重下载卡 0% → <code>set HF_ENDPOINT=https://hf-mirror.com</code> 后重跑。<br>
+        <code>CUDA out of memory</code> → 18 个原子不可能 OOM，说明是别的程序占了显存（游戏/浏览器硬件加速），关掉再跑。
+      </div></div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 12 -->
+  <section id="s12">
+    <h2 class="sh"><span class="num">12</span>第二次计算与交叉验证</h2>
+
+    <div class="step">
+      <div class="hd"><span class="sn">STEP 12</span><span class="tt">弛豫 36 原子常规胞，对比两者能量</span><span class="tag">1–2 分钟</span></div>
+
+      <div class="f"><div class="k where">去哪里</div><div class="v">同一个终端。</div></div>
+
+      <div class="f"><div class="k how">怎么做</div><div class="v">
+        <pre><span class="hl">python src/relax_bi2wo6.py --gpu --cell 67647</span>
+<span class="hl">python src/compare_relax.py</span></pre>
+        <strong>⚠️ 不要对 <code>.cif</code> 调 <code>get_potential_energy()</code></strong>，会报 <code>Atoms object has no calculator</code>。<br>
+        CIF 只存几何结构（晶胞 + 坐标），<strong>不存能量</strong>；能量存在 <code>.traj</code> 轨迹里，ASE 读轨迹时会自动挂上计算器。<code>compare_relax.py</code> 已经处理好了这件事。
+      </div></div>
+
+      <div class="f"><div class="k see">应该看到</div><div class="v">
+        <pre>18 原子原胞      relax_23584.traj   n=18   -6.6010 eV/atom  (来源: 轨迹)
+36 原子常规胞    relax_67647.traj   n=36   -6.6011 eV/atom  (来源: 轨迹)
+<span class="c">--------------------------------------------------------------</span>
+每原子能量差: 0.14 meV/atom
+判定: [自洽] 两种取胞等价，弛豫充分，可以往下做表面模型。
+<span class="c">--------------------------------------------------------------</span>
+18 原子原胞      a=8.917 b=8.917 c=5.548 Å  V=262.1 Å³  (输入 CIF V=262.1)
+36 原子常规胞    a=5.530 b=5.569 c=16.955 Å  V=522.2 Å³  (输入 CIF V=522.2)</pre>
+        <p style="margin-top:6px;">以上是这台机器的真实输出。<strong>能量差 &lt; 3 meV/atom 就算通过。</strong></p>
+      </div></div>
+
+      <div class="f"><div class="k why">为什么这个对比有意义</div><div class="v">
+        <ul>
+          <li>18 原子和 36 原子是<strong>同一个晶体</strong>的两种取胞方式，物理上完全等价。所以每原子能量必须一致。<strong>如果差很多，说明某个结构没弛豫干净，或者取胞时原子位置有问题。</strong></li>
+          <li>这是一个<strong>零成本的自我检验</strong>。很多人在这一步不查，带着一个坏结构往下算吸附能，最后结果全错却找不到原因。</li>
+          <li><strong>面试价值：</strong>"我用两种取胞做了交叉验证，每原子能量差 1.8 meV"——这句话直接证明你懂"怎么判断计算靠不靠谱"，而这正是 non-CS 背景的人最容易欠缺、也最容易被追问的地方。</li>
+        </ul>
+      </div></div>
+
+      <div class="f"><div class="k err">出错了</div><div class="v">差值 &gt; 10 meV/atom → 大概率没收敛。加大 <code>--steps 600</code> 或放宽 <code>--fmax 0.08</code> 重跑。<br>差 0.05 eV 以上 → 结构读错了，检查晶胞参数是否和 <code>data/structures/README.md</code> 一致。</div></div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 13 -->
+  <section id="s13">
+    <h2 class="sh"><span class="num">13</span>推到 GitHub</h2>
+
+    <div class="step">
+      <div class="hd"><span class="sn">STEP 13</span><span class="tt">把这个仓库变成"作品"</span><span class="tag">20 分钟</span></div>
+
+      <div class="f"><div class="k where">去哪里</div><div class="v">浏览器打开 <code>github.com</code>，登录（没账号先注册，5 分钟）。</div></div>
+
+      <div class="f"><div class="k how">怎么做</div><div class="v">
+        <strong>① 网页上建仓库：</strong>右上角 + → New repository → 名字填 <code>ai4s-starter</code> → 选 <strong>Public</strong>（实习要看）→ <strong>不要</strong>勾 "Add a README file" → Create。<br><br>
+        <strong>② 回到终端：</strong>
+        <pre><span class="hl">git init</span>
+<span class="hl">git add .</span>
+<span class="hl">git commit -m "init: Bi2WO6 relaxation with MACE"</span>
+<span class="hl">git branch -M main</span>
+<span class="hl">git remote add origin https://github.com/&lt;你的用户名&gt;/ai4s-starter.git</span>
+<span class="hl">git push -u origin main</span></pre>
+        密码处填 <strong>Personal Access Token</strong>（GitHub → Settings → Developer settings → Personal access tokens → Generate new token，勾 <code>repo</code> 权限），不是登录密码。
+      </div></div>
+
+      <div class="f"><div class="k see">应该看到</div><div class="v">刷新网页，能看到 <code>README.md</code>、<code>src/</code>、<code>data/structures/</code>、<code>docs/</code>。<br><strong>注意 <code>data/relaxed/</code> 不在里面</strong>——<code>.gitignore</code> 已经排除了它，这是故意的（计算结果不入库）。</div></div>
+
+      <div class="f"><div class="k why">为什么</div><div class="v">
+        <ul>
+          <li><strong>没有 GitHub 等于没有作品。</strong>面试官问"代码在哪"，你说"在我电脑上"——这句话的杀伤力比你想象的大得多。它传递的信息不是"你没准备好"，而是"你不知道这个行业怎么协作"。</li>
+          <li>而且它是<strong>你唯一的"进度证据"</strong>。三个月后回头看 commit 记录，你能准确说出哪一周卡在哪里——这比任何自我总结都可靠。</li>
+          <li><strong>为什么 Public：</strong>投实习时简历上要放链接。Private 仓库别人打不开，等于没有。</li>
+        </ul>
+      </div></div>
+
+      <div class="f"><div class="k err">出错了</div><div class="v">
+        <code>Authentication failed</code> → 用 Token 不用密码；或改用 SSH key。<br>
+        <code>src refspec main does not match any</code> → 你还没 commit，先跑 <code>git commit</code>。<br>
+        推上去发现 <code>data/relaxed/</code> 也在 → <code>.gitignore</code> 没生效，跑 <code>git rm -r --cached data/relaxed</code> 再提交。
+      </div></div>
+    </div>
+
+    <div class="warnbox">
+      <div class="t">⚠️ 前置：<code>'git' 不是内部或外部命令</code></div>
+      <strong>说明你还没装 Git。</strong>它不是 Python 的一部分，要单独装。<br><br>
+
+      <strong>下载（清华镜像，国内秒开）：</strong><br>
+      <code>https://mirrors.tuna.tsinghua.edu.cn/github-release/git-for-windows/git/LatestRelease/Git-2.56.0.2-64-bit.exe</code><br>
+      官方站（也可达）：<code>https://git-scm.com/download/win</code><br><br>
+
+      <strong>安装过程中只有一处要停下来选：</strong><br>
+      到 <em>"Adjusting your PATH environment"</em> 这一步，选第二个选项
+      <strong>"Git from the command line and also from 3rd-party software"</strong>（这通常是默认值，直接 Next 就行）。<br>
+      其余全部默认。
+    </div>
+
+    <div class="okbox">
+      <div class="t">为什么这次要"勾 PATH"，而装 conda 时却让你别勾？</div>
+      因为两者的问题不一样：
+      <ul style="margin:6px 0 0; padding-left:18px;">
+        <li><strong>conda</strong> 会往 PATH 里塞一整套 Python。<strong>你机器上已经有一个 Python 3.14 了</strong>，两个抢"谁是 python"会出乱子 → 所以不勾，用专用终端。</li>
+        <li><strong>Git</strong> 只有一个版本、不会和任何东西冲突，而且 VS Code、各种工具都要调它。<strong>官方默认就建议装进 PATH</strong> → 勾上。</li>
+      </ul>
+      判断标准不是"永远别勾 PATH"，而是<strong>"这东西会不会和已有的东西抢同一个名字"</strong>。
+    </div>
+
+    <div class="warnbox">
+      <div class="t">装完必须做两件事</div>
+      <strong>① 关掉当前 Anaconda Prompt，重新开一个。</strong>PATH 的修改只对<strong>新开的进程</strong>生效，老窗口里敲 <code>git</code> 还是会报同样的错。<br><br>
+      <strong>② 配置身份</strong>（不配的话 <code>git commit</code> 会拒绝执行）：<br>
+      <code>git config --global user.name "你的名字"</code><br>
+      <code>git config --global user.email "你的邮箱@xxx.com"</code><br>
+      建议用 GitHub 账号绑定的邮箱，这样提交记录能关联到你的主页。
+    </div>
+
+    <div class="okbox">
+      <div class="t">验证装好了没有</div>
+      新开终端，敲 <code>git --version</code> → 显示 <code>git version 2.56.0.windows.2</code> 之类。<br>
+      看到版本号，再回到本页 STEP 13 的六条命令。
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 14 -->
+  <section id="s14">
+    <h2 class="sh"><span class="num">14</span>W1 复盘</h2>
+
+    <div class="step">
+      <div class="hd"><span class="sn">STEP 14</span><span class="tt">写 500 字，把过程变成素材</span><span class="tag">30 分钟</span></div>
+
+      <div class="f"><div class="k where">去哪里</div><div class="v">新建 <code>docs/week1-notes.md</code>，用 VS Code 或记事本写。</div></div>
+
+      <div class="f"><div class="k how">怎么做</div><div class="v">
+        按这五个问题各写一段，不用长，但要写具体数字：
+        <ul>
+          <li>我弛豫后的晶格常数是多少？和文献值差百分之几？</li>
+          <li>能量从多少降到多少（每原子）？说明初始结构偏离平衡有多远？</li>
+          <li>18 原子和 36 原子的每原子能量差多少？为什么应该一致？</li>
+          <li>这一周卡在哪一步？最后怎么解决的？</li>
+          <li>MACE 算出的结果，我信几分？哪里可能不准？</li>
+        </ul>
+      </div></div>
+
+      <div class="f"><div class="k see">应该看到</div><div class="v">一份带具体数字的 500 字笔记。它会成为你简历里那条项目描述的原始素材。</div></div>
+
+      <div class="f"><div class="k why">为什么</div><div class="v">
+        <ul>
+          <li><strong>面试里最值钱的不是"我做过"，是"我知道它哪里可能不对"。</strong>第 5 个问题就是在训练这个能力。</li>
+          <li>你现在觉得"这有什么好写的"，三个月后想不起来当时卡在哪。<strong>笔记是写给未来的自己看的。</strong></li>
+          <li>顺带一提，这份笔记本身就是"文档能力"的证据——AI4Science 岗位上，能把计算过程写清楚的人，比会调包的人稀缺。</li>
+        </ul>
+      </div></div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 附录 -->
+  <section>
+    <h2 class="sh"><span class="num">A</span>命令速查卡（贴墙用）</h2>
+    <pre><span class="c"># 每次开工</span>
+<span class="hl">conda activate ai4s</span>
+<span class="hl">cd C:\Users\Administrator\Desktop\project</span>
+
+<span class="c"># 诊断</span>
+<span class="hl">python src/check_env.py</span>     <span class="c"># 包全不全</span>
+<span class="hl">python src/check_gpu.py</span>     <span class="c"># 显卡能不能真算</span>
+<span class="hl">pip show torch</span>              <span class="c"># 版本带不带 +cu128</span>
+
+<span class="c"># 计算</span>
+<span class="hl">python src/relax_bi2wo6.py --gpu</span>
+<span class="hl">python src/relax_bi2wo6.py --gpu --cell 67647</span>
+
+<span class="c"># 存档</span>
+<span class="hl">git add .</span>
+<span class="hl">git commit -m "描述这次改了什么"</span>
+<span class="hl">git push</span></pre>
+
+    <h2 class="sh" style="margin-top:28px"><span class="num">B</span>报错速查</h2>
+    <table>
+      <thead><tr><th style="width:38%">看到这个</th><th style="width:30%">真实原因</th><th style="width:32%">去哪一步修</th></tr></thead>
+      <tbody>
+        <tr><td><code>no kernel image is available</code></td><td>torch 不是 cu128</td><td>STEP 6</td></tr>
+        <tr><td><code>Torch not compiled with CUDA enabled</code></td><td>装成 CPU 版</td><td>STEP 6</td></tr>
+        <tr><td><code>'conda' 不是内部或外部命令</code></td><td>用错终端</td><td>STEP 2</td></tr>
+        <tr><td><code>No such file or directory: 'requirements.txt'</code></td><td>不在 project 目录</td><td>STEP 3</td></tr>
+        <tr><td><code>ModuleNotFoundError: No module named 'pandas'</code></td><td>没激活环境</td><td>STEP 5</td></tr>
+        <tr><td>装完 MACE 后 GPU 失效</td><td>torch 被降级</td><td>STEP 10</td></tr>
+        <tr><td><code>SyntaxError: Invalid syntax</code></td><td>把终端命令写进 .py</td><td>见 docs/ 里的 Day0 卡</td></tr>
+        <tr><td><code>CondaToSNonInteractiveError</code></td><td>未接受 Anaconda 渠道条款</td><td>STEP 4</td></tr>
+        <tr><td><code>EnvironmentNameNotFound: Could not find conda environment</code></td><td>环境没建成功（上一条的连锁）</td><td>STEP 4</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="sh" style="margin-top:28px"><span class="num">C</span>时间预算</h2>
+    <table>
+      <thead><tr><th style="width:18%">阶段</th><th style="width:22%">步骤</th><th style="width:20%">耗时</th><th style="width:40%">卡点概率</th></tr></thead>
+      <tbody>
+        <tr><td>基建</td><td>STEP 1–5</td><td>20 分钟</td><td>低（除非桌面被 OneDrive 接管）</td></tr>
+        <tr><td>装 GPU 引擎</td><td>STEP 6–10</td><td>30–60 分钟</td><td><strong style="color:var(--warn)">高</strong>（cu128、torch 被降级）</td></tr>
+        <tr><td>第一次计算</td><td>STEP 11–12</td><td>20 分钟</td><td>中（权重下载、MACE API 版本差异）</td></tr>
+        <tr><td>存档</td><td>STEP 13–14</td><td>50 分钟</td><td>低（Token 认证）</td></tr>
+      </tbody>
+    </table>
+
+    <div class="warnbox">
+      <div class="t">一句话总结这份手册的逻辑</div>
+      前面 10 步全在解决同一个问题：<strong>让 PyTorch 认出你的显卡</strong>。这不是 AI 的问题，是 2025 年 Blackwell 架构刚上市时生态没跟上留下的历史包袱。<strong>跨过它，后面全是化学问题——那是你的主场。</strong>
+    </div>
+  </section>
+
+  <footer>
+    生成于 2026-10-19 ｜ 对应项目目录 <code>C:\Users\Administrator\Desktop\project</code><br>
+    本手册所有路径、命令均按 RTX 5060 Ti + Windows + 无 Linux 环境编写。<strong>每装一个大包后请重跑 <code>check_gpu.py</code>。</strong>
+  </footer>
+
+</div>
+</body>
+</html>
